@@ -45,7 +45,7 @@ test('cached release uses exact versioned source URLs from HTML',()=>{
  const resources=[...html.matchAll(/<(?:script|link)[^>]+(?:src|href)="(\.\/(?:dayend-|manifest)[^"]+)"/g)].map(m=>m[1]);
  assert.ok(resources.length>=3);
  for(const resource of resources)assert.ok(sw.includes("'"+resource+"'"),resource+' is missing from the offline cache');
- assert.match(sw,/const CACHE='day-end-4\.2\.0'/);
+ assert.match(sw,/const CACHE='day-end-4\.3\.0'/);
  assert.doesNotMatch(sw,/cache\.put\('\.\/index\.html'/);
 });
 test('dialog provides keyboard focus management and a top-right outlet settings button',()=>{
@@ -62,18 +62,43 @@ test('new report sets reset the metric and navigation remains available',()=>{
  assert.match(app,/\$\('nextMetric'\)\.addEventListener/);
 });
 
-test('app header shows the same PNG icon used by the PWA manifest',()=>{
- assert.match(html,/<img class="brand-mark" src="\.\/icons\/icon-192\.png\?v=4\.2\.0"/);
+test('hero wordmark is a PNG and PWA installation links stay intact',()=>{
+ assert.match(html,/<img class="hero-wordmark" src="\.\/icons\/hero-dayend-logo\.png\?v=4\.3\.0"/);
  assert.match(html,/<link rel="icon" type="image\/png" sizes="192x192"/);
  assert.match(html,/<link rel="apple-touch-icon" sizes="180x180"/);
  assert.ok(!html.includes('<svg class="brand-mark"'));
+ assert.match(html,/id="openGear"/);
 });
 
 test('reference styling and the faster Excel reader are included in the release',()=>{
  assert.match(html,/main::after/);
  assert.match(html,/main::before/);
- assert.match(html,/\.top\{background:linear-gradient/);
+ assert.match(html,/\.top\{[^}]*background:linear-gradient/);
  assert.match(html,/<th scope="col">Value \(Rs\.\)<\/th>/);
- assert.match(sw,/excel-unpack-worker\.js\?v=4\.2\.0/);
- assert.match(readFileSync(join(root,'dayend-core.js'),'utf8'),/new Worker\('\.\/excel-unpack-worker\.js\?v=4\.2\.0'\)/);
+ assert.match(sw,/excel-unpack-worker\.js\?v=4\.3\.0/);
+ assert.match(readFileSync(join(root,'dayend-core.js'),'utf8'),/new Worker\('\.\/excel-unpack-worker\.js\?v=4\.3\.0'\)/);
+});
+
+test('full-height screens, smooth scalable footer curves, and accessible brand icon',()=>{
+ assert.match(html,/height:100dvh/);
+ assert.match(html,/overflow:hidden/);
+ assert.match(html,/<svg class="footer-waves" viewBox="0 0 600 112"/);
+ assert.match(html,/<path fill="url\(#waveBack\)" d="M0 31 C120/);
+ assert.match(html,/<path fill="url\(#waveFront\)" d="M0 54 C135/);
+ assert.doesNotMatch(html,/clip-path:polygon/);
+ assert.match(html,/<img class="hero-wordmark"[^>]*alt="DAY END"/);
+ assert.match(app,/\$\('openGear'\)\.addEventListener\('click',openOutletDialog\)/);
+});
+test('previous and next navigation have matching grid columns and decorative arrows',()=>{
+ assert.match(html,/grid-template-columns:minmax\(0,1fr\) auto minmax\(0,1fr\)/);
+ assert.match(html,/id="previousMetric" type="button"><span class="nav-arrow"/);
+ assert.match(html,/id="nextMetric" type="button"><span>Next<\/span><span class="nav-arrow"/);
+ assert.match(html,/font-size:clamp\(14px,2vw,16px\)/);
+});
+
+test('hero PNG and version-matched Excel worker are cached for offline use',()=>{
+ assert.match(html,/src="\.\/icons\/hero-dayend-logo\.png\?v=4\.3\.0"/);
+ assert.match(sw,/'\.\/icons\/hero-dayend-logo\.png\?v=4\.3\.0'/);
+ assert.match(sw,/'\.\/excel-unpack-worker\.js\?v=4\.3\.0'/);
+ assert.match(readFileSync(join(root,'dayend-core.js'),'utf8'),/new Worker\('\.\/excel-unpack-worker\.js\?v=4\.3\.0'\)/);
 });

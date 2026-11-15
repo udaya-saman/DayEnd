@@ -1,4 +1,4 @@
-# DAY END v4.2.0
+# DAY END v4.3.0
 
 A lightweight, mobile-first, offline-capable Pizza Hut outlet reporting web app for GitHub Pages.
 
@@ -91,3 +91,12 @@ The application header and site icon use the same branded design. The offline ca
 - A fallback inline unpacking path is retained for environments that block workers. Original workbook limits and validation logic remain in place.
 - The offline service worker precaches the new worker and versioned scripts for offline processing.
 - Large Excel files can still take time while parsing their XML. This improves responsiveness, not an instantaneous import.
+
+## v4.3 full-height visual polish
+
+- Header uses the white DAY END hat-and-wordmark transparent PNG adapted from the supplied reference image (`icons/hero-dayend-logo.png`), preserving the established brand appearance.
+- Both screens are constrained to the visible viewport height (modern `dvh` with a `vh` fallback), avoiding page-level vertical scrolling. In exceptional cases such as large validation messages or very small accessibility zoom, the report panel can scroll internally rather than hiding essential content.
+- The footer now uses two smooth Bézier curves, inspired by the flowing Pizza Hut hat shape, in place of polygon edges.
+- Previous/Next are equal-width buttons with clearly visible styled arrow icons and larger readable labels; the 7-category navigation remains unchanged.
+- The top-right gear icon and outlet pill both open the existing persisted outlet settings.
+- No business formulas, Excel upload rules, offline architecture, or Rs. 5 tolerance were modified.

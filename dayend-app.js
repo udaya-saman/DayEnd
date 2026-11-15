@@ -1,4 +1,4 @@
-/* DAY END v4.2.0. Local-only reporting and accessible interface. */
+/* DAY END v4.3.0. Local-only reporting and accessible interface. */
 (function () {
 'use strict';
 const core=window.DayEndCore;
@@ -82,6 +82,7 @@ function renderUpload(){
  $('dailyInput').disabled=state.busy;
  $('mtdInput').disabled=state.busy;
  $('openSettings').disabled=state.busy;
+ $('openGear').disabled=state.busy;
  if(state.view==='result'&&!result?.ok)setView('upload');
 }
 function renderResult(){
@@ -177,13 +178,15 @@ function closeSettings(){
  if(target?.isConnected)target.focus();
  else $('openSettings').focus();
 }
-$('openSettings').addEventListener('click',()=>{
+function openOutletDialog(){
  previouslyFocused.element=document.activeElement;
  fillSelect($('settingsOutlet'),state.outlet);
  $('settingsNote').textContent=sharedOutlets()?'Only outlets found in both uploaded reports can be chosen.':'You can change the outlet at any time.';
  $('settingsOverlay').hidden=false;
  $('settingsOutlet').focus();
-});
+}
+$('openSettings').addEventListener('click',openOutletDialog);
+$('openGear').addEventListener('click',openOutletDialog);
 $('closeSettings').addEventListener('click',closeSettings);
 $('confirmSettings').addEventListener('click',()=>{
  if($('settingsOutlet').selectedOptions[0]?.disabled)return;

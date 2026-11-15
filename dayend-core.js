@@ -1,4 +1,4 @@
-/* DAY END v4.2.0. Pure calculations and Excel report reader. */
+/* DAY END v4.3.0. Pure calculations and Excel report reader. */
 (function (root, factory) {
   'use strict';
   var api = factory();
@@ -6,7 +6,7 @@
   else root.DayEndCore = api;
 })(typeof window !== 'undefined' ? window : this, function () {
   'use strict';
-  var VERSION = '4.2.0';
+  var VERSION = '4.3.0';
   var TOLERANCE_CENTS = 500;
   var CHANNELS = [
     {key:'dine', label:'Dine'}, {key:'takeaway',label:'T/Away'},
@@ -204,7 +204,7 @@
     if(typeof Worker!=='undefined'){
       try {
         sources=await new Promise(function(resolve,reject){
-          var worker=new Worker('./excel-unpack-worker.js?v=4.2.0');
+          var worker=new Worker('./excel-unpack-worker.js?v=4.3.0');
           var timer=setTimeout(function(){worker.terminate();reject(Error('The file took too long to read. Please try a smaller Excel export.'));},30000);
           worker.onmessage=function(event){
             clearTimeout(timer);worker.terminate();
