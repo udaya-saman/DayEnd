@@ -108,3 +108,5 @@ The application header and site icon use the same branded design. The offline ca
 - When report data contains multiple possible matching outlets, the app asks for outlet-specific exports rather than guessing and risking incorrect sales figures.
 - Both upload and results panels have refined internal padding, additional breathing room underneath, and improved vertical positioning while retaining fixed-height mobile page behavior.
 - All formulas and Rs. 5 tolerance remain unchanged. A previously explicitly saved outlet is used as a hint only when its row exists in both new reports; no outlet can be manually changed within this interface.
+
+**Unidentified outlet display:** Until an outlet can be identified confidently from the uploaded Excel report(s), the hero's outlet label is completely blank, including no empty badge or placeholder text. Results remain blocked when the outlet cannot be established.
