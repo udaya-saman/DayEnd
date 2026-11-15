@@ -7,6 +7,7 @@ on:
       - upgrade/dayend-v4.1-clean-ui
       - upgrade/dayend-v4.2-reference-ui-fast-import
       - upgrade/dayend-v4.3-fullscreen-hero
+      - upgrade/dayend-v4.4-auto-outlet-polish
   pull_request:
     branches:
       - main

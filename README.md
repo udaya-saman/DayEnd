@@ -1,4 +1,4 @@
-# DAY END v4.3.0
+# DAY END v4.4.0
 
 A lightweight, mobile-first, offline-capable Pizza Hut outlet reporting web app for GitHub Pages.
 
@@ -100,3 +100,13 @@ The application header and site icon use the same branded design. The offline ca
 - Previous/Next are equal-width buttons with clearly visible styled arrow icons and larger readable labels; the 7-category navigation remains unchanged.
 - The top-right gear icon and outlet pill both open the existing persisted outlet settings.
 - No business formulas, Excel upload rules, offline architecture, or Rs. 5 tolerance were modified.
+
+## v4.4 auto-detected outlet and spacing
+
+- No outlet chooser or settings menu appears in the hero. The name is sourced from the Excel reports and displayed prominently at 150% of the previous font size.
+- If only one matching outlet is identifiable across the uploaded files, it is selected automatically; contradictory or ambiguous multi-outlet reports are never silently assigned an outlet.
+- When report data contains multiple possible matching outlets, the app asks for outlet-specific exports rather than guessing and risking incorrect sales figures.
+- Both upload and results panels have refined internal padding, additional breathing room underneath, and improved vertical positioning while retaining fixed-height mobile page behavior.
+- All formulas and Rs. 5 tolerance remain unchanged. A previously explicitly saved outlet is used as a hint only when its row exists in both new reports; no outlet can be manually changed within this interface.
+
+**Unidentified outlet display:** Until an outlet can be identified confidently from the uploaded Excel report(s), the hero's outlet label is completely blank, including no empty badge or placeholder text. Results remain blocked when the outlet cannot be established.

@@ -1,48 +1,16 @@
-/* DAY END v4.3.0. Local-only reporting and accessible interface. */
+/* DAY END v4.4.0. Local-only reporting and accessible interface. */
 (function () {
 'use strict';
 const core=window.DayEndCore;
 const $=id=>document.getElementById(id);
-const DEFAULT_OUTLETS=['Akuressa','Embilipitiya','Monaragala','Matara','Matara 02','Tangalle'];
-const STORE_KEY='dayend.outlet.v4';
-const state={daily:null,mtd:null,busy:false,revision:0,view:'upload',metric:'noDoc',error:[],dateOrder:'DMY',outlet:null};
-const previouslyFocused={element:null};
-function storedOutlet(){
- try{return String(localStorage.getItem(STORE_KEY)||'Matara 2');}
- catch(_){return 'Matara 2';}
+function previouslySelectedOutlet() {
+ try{return localStorage.getItem('dayend.outlet.v4')||'';}catch(_){return '';}
 }
-function persistOutlet(value){
- try{localStorage.setItem(STORE_KEY,value);return true;}
- catch(_){return false;}
-}
-state.outlet=storedOutlet();
-function presentOutlet(value){return core.outletKey(value)==='matara 2'?'Matara 02':value;}
-function allOutlets() {
- const names=new Map();
- DEFAULT_OUTLETS.forEach(name=>{if(!names.has(core.outletKey(name)))names.set(core.outletKey(name),presentOutlet(name));});
- [state.daily,state.mtd].forEach(report=>{
-  (report?.outlets||[]).forEach(row=>{
-   if(!names.has(row.key))names.set(row.key,row.name);
-  });
- });
- if(!names.has(core.outletKey(state.outlet)))names.set(core.outletKey(state.outlet),state.outlet);
- return [...names.values()].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
-}
-function sharedOutlets(){
- if(!state.daily||!state.mtd)return null;
- const mtdKeys=new Set(state.mtd.outlets.map(row=>row.key));
- return new Set(state.daily.outlets.filter(row=>mtdKeys.has(row.key)).map(row=>row.key));
-}
-function fillSelect(select,chosen) {
- const list=allOutlets(),shared=sharedOutlets(),selectedKey=core.outletKey(chosen);
- select.replaceChildren(...list.map(name=>{
-  const option=document.createElement('option'),key=core.outletKey(name);
-  option.value=name;option.disabled=!!shared&&!shared.has(key);
-  option.textContent=option.disabled?name+' (not in both reports)':name;
-  return option;
- }));
- const saved=list.find(name=>core.outletKey(name)===selectedKey);
- if(saved)select.value=saved;
+const state={daily:null,mtd:null,busy:false,revision:0,view:'upload',metric:'noDoc',error:[],dateOrder:'DMY',outlet:'',preferredOutlet:previouslySelectedOutlet()};
+function resolveOutlet() {
+ const detected=core.detectOutlet(state.daily,state.mtd,state.preferredOutlet);
+ state.outlet=detected.name;
+ return detected;
 }
 function message(host,kind,title,items){
  const box=document.createElement('div');box.className='notice '+kind;
@@ -56,6 +24,7 @@ function message(host,kind,title,items){
 }
 function selectionResult(){
  if(!state.daily||!state.mtd)return null;
+ if(!state.outlet)return null;
  return core.validate(state.daily,state.mtd,state.outlet);
 }
 function setView(name) {
@@ -66,7 +35,9 @@ function setView(name) {
  if(name==='result')renderResult();
 }
 function renderUpload(){
- $('outletName').textContent=presentOutlet(state.outlet);
+ const found=resolveOutlet();
+ $('outletName').textContent=found.name||'';
+ $('outletName').parentElement.hidden=!found.name;
  for(const [kind,cardId,fileId] of [['daily','dailyCard','dailyFile'],['mtd','mtdCard','mtdFile']]){
   const report=state[kind];
   $(cardId).classList.toggle('ready',!!report);
@@ -75,14 +46,14 @@ function renderUpload(){
  const result=selectionResult(),messages=$('uploadMessages');
  messages.replaceChildren();
  if(state.error.length)message(messages,'error','Check your reports',state.error);
+ if(found.error)message(messages,state.daily&&state.mtd?'error':'warning','Outlet detection', [found.error]);
  if(result&&!result.ok)message(messages,'error','Please check these details',result.errors);
  if(result?.ok&&result.warnings.length)message(messages,'warning','Accepted with a small difference',result.warnings);
  $('showReport').disabled=state.busy||!result?.ok;
  $('showReport').textContent=state.busy?'Reading reports…':'View Report →';
  $('dailyInput').disabled=state.busy;
  $('mtdInput').disabled=state.busy;
- $('openSettings').disabled=state.busy;
- $('openGear').disabled=state.busy;
+
  if(state.view==='result'&&!result?.ok)setView('upload');
 }
 function renderResult(){
@@ -125,18 +96,9 @@ async function upload(kind,file){
   }
  }
 }
-function changeOutlet(value){
- if(!value||state.busy)return;
- state.outlet=value;
- state.error=persistOutlet(value)?[]:['Your outlet was changed, but this browser could not save it.'];
- if(state.daily&&state.mtd&&!selectionResult()?.ok){
-  state.error.push('The selected outlet must appear in both reports. Choose another outlet or replace your files.');
- }
- setView('upload');render();
-}
 function resetReports(){
  if(state.busy)return;
- state.revision++;state.daily=null;state.mtd=null;state.error=[];
+ state.revision++;state.daily=null;state.mtd=null;state.outlet='';state.error=[];
  firstMetric();
  $('dailyInput').value='';$('mtdInput').value='';
  setView('upload');render();
@@ -171,40 +133,6 @@ $('showReport').addEventListener('click',()=>{if(selectionResult()?.ok)setView('
 $('clearFiles').addEventListener('click',resetReports);
 $('newReports').addEventListener('click',resetReports);
 $('backToUpload').addEventListener('click',()=>setView('upload'));
-function closeSettings(){
- $('settingsOverlay').hidden=true;
- const target=previouslyFocused.element;
- previouslyFocused.element=null;
- if(target?.isConnected)target.focus();
- else $('openSettings').focus();
-}
-function openOutletDialog(){
- previouslyFocused.element=document.activeElement;
- fillSelect($('settingsOutlet'),state.outlet);
- $('settingsNote').textContent=sharedOutlets()?'Only outlets found in both uploaded reports can be chosen.':'You can change the outlet at any time.';
- $('settingsOverlay').hidden=false;
- $('settingsOutlet').focus();
-}
-$('openSettings').addEventListener('click',openOutletDialog);
-$('openGear').addEventListener('click',openOutletDialog);
-$('closeSettings').addEventListener('click',closeSettings);
-$('confirmSettings').addEventListener('click',()=>{
- if($('settingsOutlet').selectedOptions[0]?.disabled)return;
- changeOutlet($('settingsOutlet').value);
- closeSettings();
-});
-$('settingsOverlay').addEventListener('click',event=>{
- if(event.target===$('settingsOverlay'))closeSettings();
-});
-document.addEventListener('keydown',event=>{
- if($('settingsOverlay').hidden)return;
- if(event.key==='Escape'){event.preventDefault();closeSettings();return;}
- if(event.key!=='Tab')return;
- const focusables=[...$('settingsOverlay').querySelectorAll('select,button')].filter(el=>!el.disabled);
- const first=focusables[0],last=focusables.at(-1);
- if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
- else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
-});
 render();
 if('serviceWorker'in navigator&&/^https?:$/.test(location.protocol)){
  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));

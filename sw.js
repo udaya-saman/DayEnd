@@ -1,10 +1,10 @@
 'use strict';
 /* Cache a complete release atomically. All app routes and scripts read from the same version. */
-const CACHE='day-end-4.3.0';
+const CACHE='day-end-4.4.0';
 const CORE=[
- './','./index.html','./dayend-core.js?v=4.3.0','./dayend-app.js?v=4.3.0',
- './manifest.json?v=4.3.0','./vendor/jszip.min.js','./excel-unpack-worker.js?v=4.3.0',
- './icons/hero-dayend-logo.png?v=4.3.0','./icons/icon-192.png','./icons/icon-192.png?v=4.3.0','./icons/icon-512.png','./icons/apple-touch-icon.png','./icons/apple-touch-icon.png?v=4.3.0','./icons/maskable-512.png'
+ './','./index.html','./dayend-core.js?v=4.4.0','./dayend-app.js?v=4.4.0',
+ './manifest.json?v=4.4.0','./vendor/jszip.min.js','./excel-unpack-worker.js?v=4.4.0',
+ './icons/hero-dayend-logo.png?v=4.4.0','./icons/icon-192.png','./icons/icon-192.png?v=4.4.0','./icons/icon-512.png','./icons/apple-touch-icon.png','./icons/apple-touch-icon.png?v=4.4.0','./icons/maskable-512.png'
 ];
 self.addEventListener('install',event=>{
  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));

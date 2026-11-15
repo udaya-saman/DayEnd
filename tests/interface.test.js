@@ -17,7 +17,8 @@ test('upload page starts with the requested upload panel and no intro or duplica
  assert.match(screen,/<h1 id="uploadTitle">[\s\S]*?Upload Excel Reports<\/h1>/);
  assert.doesNotMatch(screen,/class="intro"|class="steps"|id="outletSelect"|id="saveOutlet"/);
  assert.ok(screen.indexOf('Upload Excel Reports')<screen.indexOf('dailyCard'));
- assert.match(html,/<button class="outlet-button"[^>]*id="openSettings"/);
+ assert.match(html,/<div class="outlet-display" aria-live="polite"/);
+ assert.doesNotMatch(html,/id="openSettings"|id="openGear"|id="settingsOverlay"/);
 });
 test('results contain no summary banner or redundant cumulative value',()=>{
  const screen=inSection('resultScreen');
@@ -45,15 +46,19 @@ test('cached release uses exact versioned source URLs from HTML',()=>{
  const resources=[...html.matchAll(/<(?:script|link)[^>]+(?:src|href)="(\.\/(?:dayend-|manifest)[^"]+)"/g)].map(m=>m[1]);
  assert.ok(resources.length>=3);
  for(const resource of resources)assert.ok(sw.includes("'"+resource+"'"),resource+' is missing from the offline cache');
- assert.match(sw,/const CACHE='day-end-4\.3\.0'/);
+ assert.match(sw,/const CACHE='day-end-4\.4\.0'/);
  assert.doesNotMatch(sw,/cache\.put\('\.\/index\.html'/);
 });
-test('dialog provides keyboard focus management and a top-right outlet settings button',()=>{
- assert.match(html,/aria-modal="true"/);
- assert.match(html,/id="settingsOutlet"/);
- assert.match(app,/event\.key!=='Tab'/);
- assert.match(app,/event\.key==='Escape'/);
- assert.match(app,/sharedOutlets\(\)/);
+test('outlet display uses sheet-derived data without manual settings',()=>{
+ assert.match(html,/class="outlet-display"[^>]*hidden><span id="outletName"><\/span>/);
+ assert.match(app,/\$\(\x27outletName\x27\)\.textContent=found\.name\|\|\x27\x27/);
+ assert.match(app,/\$\(\x27outletName\x27\)\.parentElement\.hidden=!found\.name/);
+ assert.doesNotMatch(html,/Awaiting outlet/);
+ assert.match(html,/\.outlet-display span\{[^}]*font-size:19\.5px/);
+ assert.match(html,/\.outlet-display span\{font-size:16\.5px/);
+ assert.match(app,/core\.detectOutlet\(state\.daily,state\.mtd,state\.preferredOutlet\)/);
+ assert.doesNotMatch(app,/openOutletDialog|openSettings|openGear|settingsOverlay/);
+ assert.match(app,/localStorage.getItem\('dayend.outlet.v4'\)/);
 });
 test('new report sets reset the metric and navigation remains available',()=>{
  assert.match(app,/function firstMetric\(\)/);
@@ -63,11 +68,11 @@ test('new report sets reset the metric and navigation remains available',()=>{
 });
 
 test('hero wordmark is a PNG and PWA installation links stay intact',()=>{
- assert.match(html,/<img class="hero-wordmark" src="\.\/icons\/hero-dayend-logo\.png\?v=4\.3\.0"/);
+ assert.match(html,/<img class="hero-wordmark" src="\.\/icons\/hero-dayend-logo\.png\?v=4\.4\.0"/);
  assert.match(html,/<link rel="icon" type="image\/png" sizes="192x192"/);
  assert.match(html,/<link rel="apple-touch-icon" sizes="180x180"/);
  assert.ok(!html.includes('<svg class="brand-mark"'));
- assert.match(html,/id="openGear"/);
+ assert.doesNotMatch(html,/id="openGear"/);
 });
 
 test('reference styling and the faster Excel reader are included in the release',()=>{
@@ -75,8 +80,8 @@ test('reference styling and the faster Excel reader are included in the release'
  assert.match(html,/main::before/);
  assert.match(html,/\.top\{[^}]*background:linear-gradient/);
  assert.match(html,/<th scope="col">Value \(Rs\.\)<\/th>/);
- assert.match(sw,/excel-unpack-worker\.js\?v=4\.3\.0/);
- assert.match(readFileSync(join(root,'dayend-core.js'),'utf8'),/new Worker\('\.\/excel-unpack-worker\.js\?v=4\.3\.0'\)/);
+ assert.match(sw,/excel-unpack-worker\.js\?v=4\.4\.0/);
+ assert.match(readFileSync(join(root,'dayend-core.js'),'utf8'),/new Worker\('\.\/excel-unpack-worker\.js\?v=4\.4\.0'\)/);
 });
 
 test('full-height screens, smooth scalable footer curves, and accessible brand icon',()=>{
@@ -87,7 +92,7 @@ test('full-height screens, smooth scalable footer curves, and accessible brand i
  assert.match(html,/<path fill="url\(#waveFront\)" d="M0 54 C135/);
  assert.doesNotMatch(html,/clip-path:polygon/);
  assert.match(html,/<img class="hero-wordmark"[^>]*alt="DAY END"/);
- assert.match(app,/\$\('openGear'\)\.addEventListener\('click',openOutletDialog\)/);
+ assert.doesNotMatch(app,/openOutletDialog/);
 });
 test('previous and next navigation have matching grid columns and decorative arrows',()=>{
  assert.match(html,/grid-template-columns:minmax\(0,1fr\) auto minmax\(0,1fr\)/);
@@ -97,8 +102,16 @@ test('previous and next navigation have matching grid columns and decorative arr
 });
 
 test('hero PNG and version-matched Excel worker are cached for offline use',()=>{
- assert.match(html,/src="\.\/icons\/hero-dayend-logo\.png\?v=4\.3\.0"/);
- assert.match(sw,/'\.\/icons\/hero-dayend-logo\.png\?v=4\.3\.0'/);
- assert.match(sw,/'\.\/excel-unpack-worker\.js\?v=4\.3\.0'/);
- assert.match(readFileSync(join(root,'dayend-core.js'),'utf8'),/new Worker\('\.\/excel-unpack-worker\.js\?v=4\.3\.0'\)/);
+ assert.match(html,/src="\.\/icons\/hero-dayend-logo\.png\?v=4\.4\.0"/);
+ assert.match(sw,/'\.\/icons\/hero-dayend-logo\.png\?v=4\.4\.0'/);
+ assert.match(sw,/'\.\/excel-unpack-worker\.js\?v=4\.4\.0'/);
+ assert.match(readFileSync(join(root,'dayend-core.js'),'utf8'),/new Worker\('\.\/excel-unpack-worker\.js\?v=4\.4\.0'\)/);
+});
+
+test('balanced upload and result panels retain safe internal scrolling',()=>{
+ assert.match(html,/#uploadScreen\{justify-content:center;padding-bottom:clamp/);
+ assert.match(html,/#uploadScreen \.panel\{margin-top:0;padding:clamp/);
+ assert.match(html,/#resultScreen\{justify-content:center;padding-bottom:clamp/);
+ assert.match(html,/#resultScreen \.panel\{padding:clamp/);
+ assert.match(html,/max-height:100%;overflow-y:auto/);
 });

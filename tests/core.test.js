@@ -151,3 +151,39 @@ test('date parsing avoids traversing every row when report dates are at the top'
  rows[19999]=new Proxy([], {get(){throw Error('Scanned unnecessary distant cells');}});
  assert.deepEqual(core.parseDateRange(rows,'DMY'),{from:'2026-11-01',to:'2026-11-15'});
 });
+
+test('automatically detect a single outlet from one report',()=>{
+ const report=makeReport('2026-11-01','2026-11-01',{name:'Tangalle'});
+ assert.deepEqual(core.detectOutlet(report,null),{name:'Tangalle',error:''});
+});
+test('automatically resolve a unique shared outlet across two reports',()=>{
+ const daily=makeReport('2026-11-02','2026-11-02',{name:'Matara 2'});
+ const mtd=makeReport('2026-11-01','2026-11-02',{name:'Matara 02'});
+ daily.outlets.push({...daily.outlets[0],name:'Galle',key:'galle'});
+ assert.equal(core.detectOutlet(daily,mtd).name,'Matara 2');
+});
+test('reject mismatched or ambiguous multi-outlet reports without guessing',()=>{
+ const daily=makeReport('2026-11-02','2026-11-02',{name:'Matara 2'});
+ const mtd=makeReport('2026-11-01','2026-11-02',{name:'Tangalle'});
+ const unmatched=core.detectOutlet(daily,mtd);
+ assert.equal(unmatched.name,'');
+ assert.match(unmatched.error,/do not contain the same outlet/);
+ mtd.outlets=[{...daily.outlets[0]}];
+ daily.outlets.push({...daily.outlets[0],name:'Galle',key:'galle'});
+ mtd.outlets.push({...daily.outlets[1]});
+ const ambiguous=core.detectOutlet(daily,mtd);
+ assert.equal(ambiguous.name,'');
+ assert.match(ambiguous.error,/more than one matching outlet/);
+});
+
+test('a previously selected outlet is used only when the new report contains it',()=>{
+ const daily=makeReport('2026-11-02','2026-11-02',{name:'Matara 2'});
+ daily.outlets.push({...daily.outlets[0],name:'Galle',key:'galle'});
+ const mtd=makeReport('2026-11-01','2026-11-02',{name:'Matara 02'});
+ mtd.outlets.push({...mtd.outlets[0],name:'Galle',key:'galle'});
+ const matched=core.detectOutlet(daily,mtd,'Matara 02');
+ assert.equal(core.outletKey(matched.name),'matara 2');
+ const unknown=core.detectOutlet(daily,mtd,'Akuressa');
+ assert.equal(unknown.name,'');
+ assert.match(unknown.error,/more than one matching outlet/);
+});
