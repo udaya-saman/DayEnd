@@ -9,9 +9,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="DAY END">
 <title>DAY END | Outlet reports</title>
-<link rel="manifest" href="./manifest.json?v=4.1.0">
-<link rel="icon" href="./icons/icon-192.png">
-<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="manifest" href="./manifest.json?v=4.1.1">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=4.1.1">
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=4.1.1">
 <style>
 :root{
  --red:#c92026;--red-hover:#ac171f;--red-soft:#fff2f2;--ink:#161b27;
@@ -31,7 +31,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .top{background:rgba(255,255,255,.96);border-bottom:1px solid var(--line)}
 .top-inner{min-height:82px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 24px}
 .brand{display:flex;align-items:center;gap:12px}
-.brand-mark{width:44px;height:44px;background:linear-gradient(140deg,#f03b3e,#b8151d);border-radius:13px;display:grid;place-items:center;color:white;font-size:16px;font-weight:900;letter-spacing:-.04em;box-shadow:0 4px 14px rgba(201,32,38,.18)}
+.brand-mark{width:44px;height:44px;border-radius:13px;display:block;object-fit:cover;box-shadow:0 4px 14px rgba(201,32,38,.18)}
 .brand-title{font-size:17px;line-height:1.15;letter-spacing:.09em;font-weight:900}
 .brand-subtitle{font-size:12px;color:var(--muted);margin-top:3px}
 .outlet-button{display:inline-flex;align-items:center;justify-content:center;gap:9px;max-width:58%;min-height:44px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font-size:13px;font-weight:750;transition:border-color .15s,background .15s}
@@ -117,7 +117,7 @@ main{padding:24px 14px 32px}
 <script defer src="./dayend-app.js?v=4.1.0"></script>
 </head>
 <body>
-<header class="top"><div class="shell top-inner"><div class="brand"><div class="brand-mark" aria-hidden="true">DE</div><div><div class="brand-title">DAY END</div><div class="brand-subtitle">Outlet reporting</div></div></div><button class="outlet-button" type="button" id="openSettings" aria-label="Change outlet" aria-haspopup="dialog"><span id="outletName">Matara 02</span><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16M8 4v6M16 14v6" stroke-linecap="round"/></svg></button></div></header>
+<header class="top"><div class="shell top-inner"><div class="brand"><img class="brand-mark" src="./icons/icon-192.png?v=4.1.1" width="44" height="44" alt=""><div><div class="brand-title">DAY END</div><div class="brand-subtitle">Outlet reporting</div></div></div><button class="outlet-button" type="button" id="openSettings" aria-label="Change outlet" aria-haspopup="dialog"><span id="outletName">Matara 02</span><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16M8 4v6M16 14v6" stroke-linecap="round"/></svg></button></div></header>
 <main class="shell">
 <section id="uploadScreen" aria-labelledby="uploadTitle">
 <div class="panel">
