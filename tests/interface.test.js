@@ -45,7 +45,7 @@ test('cached release uses exact versioned source URLs from HTML',()=>{
  const resources=[...html.matchAll(/<(?:script|link)[^>]+(?:src|href)="(\.\/(?:dayend-|manifest)[^"]+)"/g)].map(m=>m[1]);
  assert.ok(resources.length>=3);
  for(const resource of resources)assert.ok(sw.includes("'"+resource+"'"),resource+' is missing from the offline cache');
- assert.match(sw,/const CACHE='day-end-4\.1\.0'/);
+ assert.match(sw,/const CACHE='day-end-4\.1\.1'/);
  assert.doesNotMatch(sw,/cache\.put\('\.\/index\.html'/);
 });
 test('dialog provides keyboard focus management and a top-right outlet settings button',()=>{
@@ -60,4 +60,11 @@ test('new report sets reset the metric and navigation remains available',()=>{
  assert.match(app,/function resetReports\(\)[\s\S]*?firstMetric\(\)/);
  assert.match(app,/\$\('previousMetric'\)\.addEventListener/);
  assert.match(app,/\$\('nextMetric'\)\.addEventListener/);
+});
+
+test('app header shows the same PNG icon used by the PWA manifest',()=>{
+ assert.match(html,/<img class="brand-mark" src="\.\/icons\/icon-192\.png\?v=4\.1\.1"/);
+ assert.match(html,/<link rel="icon" type="image\/png" sizes="192x192"/);
+ assert.match(html,/<link rel="apple-touch-icon" sizes="180x180"/);
+ assert.ok(!html.includes('<svg class="brand-mark"'));
 });
