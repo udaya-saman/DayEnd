@@ -95,3 +95,10 @@ test('previous and next navigation have matching grid columns and decorative arr
  assert.match(html,/id="nextMetric" type="button"><span>Next<\/span><span class="nav-arrow"/);
  assert.match(html,/font-size:clamp\(14px,2vw,16px\)/);
 });
+
+test('hero PNG and version-matched Excel worker are cached for offline use',()=>{
+ assert.match(html,/src="\.\/icons\/hero-dayend-logo\.png\?v=4\.3\.0"/);
+ assert.match(sw,/'\.\/icons\/hero-dayend-logo\.png\?v=4\.3\.0'/);
+ assert.match(sw,/'\.\/excel-unpack-worker\.js\?v=4\.3\.0'/);
+ assert.match(readFileSync(join(root,'dayend-core.js'),'utf8'),/new Worker\('\.\/excel-unpack-worker\.js\?v=4\.3\.0'\)/);
+});
