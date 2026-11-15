@@ -36,7 +36,8 @@ function setView(name) {
 }
 function renderUpload(){
  const found=resolveOutlet();
- $('outletName').textContent=found.name||'Awaiting outlet';
+ $('outletName').textContent=found.name||'';
+ $('outletName').parentElement.hidden=!found.name;
  for(const [kind,cardId,fileId] of [['daily','dailyCard','dailyFile'],['mtd','mtdCard','mtdFile']]){
   const report=state[kind];
   $(cardId).classList.toggle('ready',!!report);
