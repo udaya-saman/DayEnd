@@ -46,7 +46,7 @@ test('cached release uses exact versioned source URLs from HTML',()=>{
  const resources=[...html.matchAll(/<(?:script|link)[^>]+(?:src|href)="(\.\/(?:dayend-|manifest)[^"]+)"/g)].map(m=>m[1]);
  assert.ok(resources.length>=3);
  for(const resource of resources)assert.ok(sw.includes("'"+resource+"'"),resource+' is missing from the offline cache');
- assert.match(sw,/const CACHE='day-end-4\.4\.1'/);
+ assert.match(sw,/const CACHE='day-end-4\.4\.2'/);
  assert.doesNotMatch(sw,/cache\.put\('\.\/index\.html'/);
 });
 test('outlet display uses sheet-derived data without manual settings',()=>{
@@ -80,8 +80,8 @@ test('reference styling and the faster Excel reader are included in the release'
  assert.match(html,/main::before/);
  assert.match(html,/\.top\{[^}]*background:linear-gradient/);
  assert.match(html,/<th scope="col">Value \(Rs\.\)<\/th>/);
- assert.match(sw,/excel-unpack-worker\.js\?v=4\.4\.0/);
- assert.match(readFileSync(join(root,'dayend-core.js'),'utf8'),/new Worker\('\.\/excel-unpack-worker\.js\?v=4\.4\.0'\)/);
+ assert.match(sw,/excel-unpack-worker\.js\?v=4\.4\.2/);
+ assert.match(readFileSync(join(root,'dayend-core.js'),'utf8'),/new Worker\('\.\/excel-unpack-worker\.js\?v=4\.4\.2'\)/);
 });
 
 test('full-height screens, smooth scalable footer curves, and accessible brand icon',()=>{
@@ -104,8 +104,8 @@ test('previous and next navigation have matching grid columns and decorative arr
 test('hero PNG and version-matched Excel worker are cached for offline use',()=>{
  assert.match(html,/src="\.\/icons\/hero-dayend-logo\.png\?v=4\.4\.0"/);
  assert.match(sw,/'\.\/icons\/hero-dayend-logo\.png\?v=4\.4\.0'/);
- assert.match(sw,/'\.\/excel-unpack-worker\.js\?v=4\.4\.0'/);
- assert.match(readFileSync(join(root,'dayend-core.js'),'utf8'),/new Worker\('\.\/excel-unpack-worker\.js\?v=4\.4\.0'\)/);
+ assert.match(sw,/'\.\/excel-unpack-worker\.js\?v=4\.4\.2'/);
+ assert.match(readFileSync(join(root,'dayend-core.js'),'utf8'),/new Worker\('\.\/excel-unpack-worker\.js\?v=4\.4\.2'\)/);
 });
 
 test('balanced upload and result panels retain safe internal scrolling',()=>{
@@ -123,5 +123,15 @@ test('accepted sales differences are silent on both screens, without changing va
  const core=readFileSync(join(root,'dayend-core.js'),'utf8');
  assert.match(core,/TOLERANCE_CENTS = 500/);
  assert.match(core,/Math\.abs\(diff\)>TOLERANCE_CENTS/);
- assert.match(core,/warnings\.push\(item\.name\+' sales have a Rs\./);
+ assert.doesNotMatch(core,/accepted within the Rs\.|warnings\.push\(item\.name/);
+});
+
+test('online navigation revalidates HTML while offline navigation uses the saved shell',()=>{
+ assert.match(sw,/fetch\(request,\{cache:'no-store'\}\)/);
+ assert.match(sw,/caches\.match\('\.\/index\.html'\)/);
+ assert.doesNotMatch(sw,/if\(request\.mode==='navigate'\)[\s\S]{0,100}cache\.match\('\.\/index\.html'\)/);
+ assert.match(app,/register\('\.\/sw\.js',\{updateViaCache:'none'\}\)/);
+ assert.match(app,/registration\.update\(\)/);
+ const core=readFileSync(join(root,'dayend-core.js'),'utf8');
+ assert.doesNotMatch(core,/accepted within the Rs\. 5\.00 limit/);
 });

@@ -1,4 +1,4 @@
-/* DAY END v4.4.1. Local-only reporting and accessible interface. */
+/* DAY END v4.4.2. Local-only reporting and accessible interface. */
 (function () {
 'use strict';
 const core=window.DayEndCore;
@@ -132,6 +132,11 @@ $('newReports').addEventListener('click',resetReports);
 $('backToUpload').addEventListener('click',()=>setView('upload'));
 render();
 if('serviceWorker'in navigator&&/^https?:$/.test(location.protocol)){
- window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+ window.addEventListener('load',()=>{
+  navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(registration=>{
+    // Ensure an already-installed app checks for the latest offline release.
+    registration.update().catch(()=>{});
+  }).catch(()=>{});
+ });
 }
 })();
