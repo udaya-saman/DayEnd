@@ -98,6 +98,7 @@ function renderResult(){
  $('resultDate').textContent=dateLabel(state.daily.to);
  $('resultPeriod').textContent=dateLabel(state.mtd.from)+' – '+dateLabel(state.mtd.to);
  $('metric').value=state.metric;
+ $('metricPosition').textContent=(core.METRICS.findIndex(metric=>metric.key===state.metric)+1)+' of '+core.METRICS.length;
  const values=core.CHANNELS.map((channel,index)=>({
    label:channel.label,value:core.metricValue(state.metric,index,result.daily,result.mtd,result.days)
  }));
@@ -174,6 +175,8 @@ core.METRICS.forEach(metric=>{
  const option=document.createElement('option');option.value=metric.key;option.textContent=metric.label;$('metric').append(option);
 });
 $('metric').addEventListener('change',event=>{state.metric=event.target.value;renderResult();});
+$('previousMetric').addEventListener('click',()=>{state.metric=core.adjacentMetric(state.metric,-1);renderResult();});
+$('nextMetric').addEventListener('click',()=>{state.metric=core.adjacentMetric(state.metric,1);renderResult();});
 $('showReport').addEventListener('click',()=>{if(selectionResult()?.ok)setView('result');});
 $('saveOutlet').addEventListener('click',()=>chooseOutlet($('outletSelect').value));
 $('clearFiles').addEventListener('click',resetReports);
