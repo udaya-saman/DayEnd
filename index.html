@@ -3,173 +3,151 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>DAY END</title>
-<meta name="theme-color" content="#EE3124">
+<meta name="theme-color" content="#C92026">
 <meta name="color-scheme" content="light">
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icons/icon-192.png">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="DAY END">
+<title>DAY END | Outlet Reporting</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 <style>
-:root{--red:#EE3124;--deep:#C90014;--ink:#141414;--mut:#6b6b6b;--bg:#F4F3F1;--line:#E8E6E3}
-*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}[hidden]{display:none!important}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100svh;padding-bottom:calc(32px + env(safe-area-inset-bottom))}
-.top{background:#141414;color:#fff;display:flex;justify-content:space-between;align-items:center;padding:calc(14px + env(safe-area-inset-top)) 20px 14px;border-bottom:4px solid var(--red)}
-.top b{font-size:1.15rem;letter-spacing:.08em}.top span{font-size:.85rem;color:#d6d6d6}
-main{max-width:520px;margin:0 auto;padding:20px 16px}
-.pick{text-align:center;padding-top:12vh}.pick.drag .big{outline:3px dashed var(--ink);outline-offset:4px}
-.big{display:flex;align-items:center;justify-content:center;width:100%;min-height:64px;border-radius:16px;background:var(--red);color:#fff;font-size:1.2rem;font-weight:800;cursor:pointer;position:relative}
-.big:active{background:var(--deep)}.big:focus-within{outline:3px solid var(--ink);outline-offset:3px}
-.big input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0}
-.big.busy{background:#8a8a8a;pointer-events:none}
-.chips{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:8px}.chips li{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-weight:700;text-align:left;display:flex;justify-content:space-between;gap:10px}.chips li span{color:var(--mut);font-weight:500}
-.msg{margin:14px 0 0;background:#fff;border-left:5px solid var(--deep);border-radius:12px;padding:12px 14px;text-align:left;color:var(--deep);font-weight:600;font-size:.95rem}.msg p{margin:0}.msg p+p{margin-top:6px}
-.bar{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:2px 2px 16px}.when b{display:block;font-size:1.15rem}.when span{color:var(--mut);font-size:.88rem}
-.link{min-height:44px;padding:0 14px;border:1.5px solid var(--ink);border-radius:12px;background:#fff;font:inherit;font-weight:700;cursor:pointer}.link:focus-visible{outline:3px solid var(--red);outline-offset:2px}
-.card{background:#fff;border-radius:18px;padding:16px 18px;margin-bottom:12px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
-.card h2{margin:0 0 6px;font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--deep)}
-.hero{background:#141414;color:#fff;border-top:5px solid var(--red)}.hero h2{color:#fff}
-.hero .num{font-size:clamp(2.2rem,11vw,3rem);font-weight:900;letter-spacing:-.03em;line-height:1.1;font-variant-numeric:tabular-nums}.hero .cap{color:#cfcfcf;font-size:.82rem;margin-bottom:6px}
-dl{margin:0}dl div{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--line)}.hero dl div{border-color:#3a3a3a}
-dl .tot{border-top:2px solid var(--ink)}dl .tot dt,dl .tot dd{color:var(--deep);font-weight:900}
-dt{color:var(--mut);font-size:.95rem}.hero dt{color:#cfcfcf}dd{margin:0;font-weight:800;font-variant-numeric:tabular-nums;font-size:1.02rem}
+:root{--red:#c92026;--red-dark:#a60d17;--ink:#171d27;--muted:#647082;--line:#e3e8ed;--surface:#fff;--bg:#f5f7fa;--success:#18794e;--warn:#855600;--radius:17px}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100svh;padding-bottom:env(safe-area-inset-bottom)}
+[hidden]{display:none!important}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
+:focus-visible{outline:3px solid #f1aa4b;outline-offset:3px}
+.shell{max-width:1020px;margin:auto}
+.top{background:#fff;border-bottom:1px solid var(--line);box-shadow:0 2px 16px rgba(20,25,34,.03)}
+.top-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 22px;min-height:82px}
+.identity{display:flex;align-items:center;gap:13px}
+.mark{height:42px;width:42px;background:var(--red);border-radius:13px;display:flex;align-items:center;justify-content:center;color:white;font-size:17px;font-weight:900;letter-spacing:-.07em}
+.identity strong{display:block;letter-spacing:.1em;font-size:16px}
+.identity small{display:block;color:var(--muted);font-size:12px}
+.outlet-button{display:flex;align-items:center;gap:8px;padding:10px 12px;max-width:50%;border:1px solid var(--line);background:#fff;border-radius:11px;color:var(--ink);font-weight:700;font-size:13px}
+.outlet-button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+main{padding:34px 22px 60px}
+.intro{margin:0 0 24px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin:0 0 9px}
+h1{font-size:clamp(26px,4vw,36px);letter-spacing:-.035em;line-height:1.16;margin:0 0 10px;font-weight:800}
+p{margin:0}
+.subtitle{color:var(--muted);max-width:610px;font-size:15px}
+.steps{display:flex;gap:9px;align-items:center;margin:0 0 23px}
+.step{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-weight:700}
+.step-number{width:25px;height:25px;display:grid;place-items:center;border-radius:50%;background:#e9edf3;font-size:12px}
+.step.active{color:var(--red)}.step.active .step-number{background:#fff0f0;border:1px solid #f1c9c9}
+.step.done{color:var(--success)}.step.done .step-number{background:#dcf4e9}
+.step-divider{height:1px;background:var(--line);width:34px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:23px;box-shadow:0 6px 28px rgba(25,32,45,.045)}
+.panel+.panel{margin-top:16px}
+.section-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px}
+h2{font-size:17px;font-weight:800;letter-spacing:-.02em;margin:0}
+.mini{font-size:12px;color:var(--muted)}
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.upload-card{position:relative;min-height:184px;border:1.5px dashed #c7d0dc;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:8px;background:#fcfdfe;transition:border-color .15s,background .15s}
+.upload-card:focus-within,.upload-card.drag{border-color:var(--red);background:#fff8f8}
+.upload-card.ready{border-color:#a2d9b9;background:#f7fffa}
+.upload-card input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.upload-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:#eff2f7;font-size:21px}
+.upload-label{font-weight:800;font-size:15px}
+.upload-hint{font-size:13px;color:var(--muted)}
+.file-name{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:750;color:var(--success);margin-top:auto}
+.setting{margin-top:18px;display:flex;align-items:flex-end;gap:12px}
+.setting-field{flex:1}
+.field-label{display:block;font-weight:750;margin-bottom:7px;font-size:13px}
+select{display:block;width:100%;height:48px;padding:0 40px 0 14px;border:1px solid #cbd3dc;border-radius:11px;background:#fff;color:var(--ink);font-weight:650;font-size:15px}
+select:disabled{background:#f5f5f5}
+.hint{font-size:12px;color:var(--muted);margin-top:7px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.btn{min-height:47px;border-radius:11px;padding:10px 18px;font-weight:800;border:1px solid transparent}
+.btn.primary{background:var(--red);color:#fff}
+.btn.primary:hover:not(:disabled){background:var(--red-dark)}
+.btn.secondary{background:#fff;color:var(--ink);border-color:#cbd3dc}
+.btn.secondary:hover{background:#f5f7fa}
+.notice{border:1px solid;border-radius:12px;padding:13px 15px;margin-top:16px;font-size:13px}
+.notice strong{display:block;margin-bottom:3px;font-size:13px}
+.notice.error{background:#fff5f4;border-color:#f0b8b4;color:#97251f}
+.notice.warning{background:#fffaf0;border-color:#efd6a2;color:#704800}
+.notice.success{background:#f0fcf5;border-color:#b6e3c8;color:#13663e}
+.notice ul{margin:5px 0 0;padding-left:20px}
+.result-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:24px}
+.result-title{font-size:clamp(25px,4vw,34px)}
+.result-actions{display:flex;gap:8px;flex-wrap:wrap}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.summary-item{border:1px solid var(--line);border-radius:14px;padding:15px 17px;background:#fff}
+.summary-item span{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}
+.summary-item strong{display:block;font-size:14px;overflow-wrap:anywhere}
+.summary-item .date-strong{font-variant-numeric:tabular-nums}
+.report-hero{display:flex;justify-content:space-between;align-items:center;gap:15px;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:7px}
+.report-hero .metric-label{font-size:12px;color:var(--muted);font-weight:750;letter-spacing:.05em}
+.report-hero .value{font-size:clamp(23px,4.5vw,33px);font-weight:850;letter-spacing:-.04em;line-height:1.3;font-variant-numeric:tabular-nums}
+.report-hero .unit{font-size:12px;color:var(--muted);font-weight:650}
+.metric-picker{max-width:275px;min-width:210px}
+.metric-navigation{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 13px;padding:12px 0 15px;border-bottom:1px solid var(--line)}
+.metric-navigation .btn{min-height:44px;padding:9px 14px;white-space:nowrap}
+.metric-position{color:var(--muted);font-size:13px;font-weight:750;white-space:nowrap;font-variant-numeric:tabular-nums}
+.data-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.data-table th{text-align:left;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em;padding:14px 8px}
+.data-table th:last-child,.data-table td:last-child{text-align:right}
+.data-table td{border-top:1px solid var(--line);padding:15px 8px;font-size:15px}
+.data-table td:last-child{font-weight:800}
+.data-table tr.total{background:#fff9f9;color:var(--red-dark)}
+.data-table tr.total td{font-weight:850;border-top:2px solid #f0c6c8}
+.footer-note{margin-top:18px;color:var(--muted);font-size:12px}
+.dialog-wrap{position:fixed;inset:0;background:rgba(16,24,36,.56);display:grid;place-items:center;padding:20px;z-index:20}
+.dialog{background:#fff;border-radius:18px;padding:24px;width:min(100%,450px);box-shadow:0 20px 70px rgba(0,0,0,.2)}
+.dialog h2{margin-bottom:8px}.dialog p{color:var(--muted);font-size:13px;margin-bottom:16px}
+.setting-badge{display:inline-flex;gap:6px;align-items:center;background:#f5f7fa;padding:6px 9px;border-radius:9px;color:var(--muted);font-size:12px}
+@media(max-width:650px){
+main{padding:24px 16px 44px}.top-inner{padding:13px 16px;min-height:70px}
+.panel{padding:17px}.upload-grid{grid-template-columns:1fr;gap:12px}
+.upload-card{min-height:144px;padding:15px}.result-top{display:block}.result-actions{margin-top:15px}
+.summary{grid-template-columns:1fr 1fr}.summary-item:first-child{grid-column:span 2}
+.report-hero{display:block}.metric-picker{max-width:none;width:100%;margin-bottom:15px}
+.setting{display:block}.setting .btn{margin-top:12px}.btn{min-height:48px}
+.metric-navigation{gap:6px}.metric-navigation .btn{padding:9px 11px}
+.data-table td{padding:13px 6px}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style>
-<script src="vendor/jszip.min.js"></script>
+<script defer src="./vendor/jszip.min.js"></script>
+<script defer src="./dayend-core.js"></script>
+<script defer src="./dayend-app.js"></script>
 </head>
 <body>
-<header class="top"><b>DAY END</b><span>Matara 2</span></header>
-<main>
-  <section class="pick" id="pick">
-    <label class="big" id="big"><span id="bigText">Choose Daily + MTD reports</span><input id="files" type="file" multiple accept=".xlsx,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12" aria-label="Choose the Daily and MTD Excel reports"></label>
-    <ul class="chips" id="chips"></ul>
-    <div class="msg" id="msg" role="alert" hidden></div>
-  </section>
-  <section id="out" hidden>
-    <div class="bar"><div class="when"><b id="whenDay"></b><span id="whenMtd"></span></div><button class="link" id="reset" type="button">New reports</button></div>
-    <div id="cards"></div>
-  </section>
+<header class="top"><div class="shell top-inner"><div class="identity"><div class="mark" aria-hidden="true">DE</div><div><strong>DAY END</strong><small>Outlet reporting</small></div></div><button class="outlet-button" type="button" id="openSettings" aria-label="Change saved outlet"><span id="outletName">Choose outlet</span><span aria-hidden="true">⚙</span></button></div></header>
+<main class="shell">
+<section id="uploadScreen" aria-labelledby="uploadTitle">
+<div class="intro"><p class="eyebrow">DAILY REPORTING</p><h1 id="uploadTitle">Your day, at a glance.</h1><p class="subtitle">Add your Daily and Month-to-Date Excel reports. We’ll check the figures before showing your summary.</p></div>
+<div class="steps"><div class="step active"><span class="step-number">1</span>Upload reports</div><span class="step-divider"></span><div class="step"><span class="step-number">2</span>View summary</div></div>
+<div class="panel"><div class="section-heading"><h2>Upload Excel reports</h2><span class="mini">.xlsx or .xlsm · max 25 MB each</span></div>
+<div class="upload-grid">
+<label class="upload-card" id="dailyCard"><span class="upload-icon" aria-hidden="true">↥</span><span class="upload-label">Daily report</span><span class="upload-hint">Report for one date. Tap to choose or replace.</span><span class="file-name" id="dailyFile">No file selected</span><input type="file" id="dailyInput" accept=".xlsx,.xlsm" aria-label="Choose Daily Excel report"></label>
+<label class="upload-card" id="mtdCard"><span class="upload-icon" aria-hidden="true">↥</span><span class="upload-label">MTD report</span><span class="upload-hint">Report from the first of the month. Tap to choose or replace.</span><span class="file-name" id="mtdFile">No file selected</span><input type="file" id="mtdInput" accept=".xlsx,.xlsm" aria-label="Choose MTD Excel report"></label>
+</div>
+<div class="setting"><div class="setting-field"><label class="field-label" for="outletSelect">Outlet</label><select id="outletSelect" aria-describedby="outletHelp"></select><p class="hint" id="outletHelp">Your selection is saved on this device. Use the settings button to change it later.</p></div><button class="btn secondary" type="button" id="saveOutlet">Save outlet</button></div>
+<div id="uploadMessages" role="alert" aria-live="polite"></div>
+<div class="actions"><button class="btn primary" id="showReport" type="button" disabled>View report →</button><button class="btn secondary" id="clearFiles" type="button">Clear reports</button></div>
+</div>
+<div class="footer-note">Your Excel files are processed on this device. They are not sent to a server. The app can work offline after its first successful installation.</div>
+</section>
+<section id="resultScreen" aria-labelledby="resultTitle" hidden>
+<div class="steps"><div class="step done"><span class="step-number">✓</span>Upload reports</div><span class="step-divider"></span><div class="step active"><span class="step-number">2</span>View summary</div></div>
+<div class="result-top"><div><p class="eyebrow">VALIDATED REPORT</p><h1 class="result-title" id="resultTitle">Day end summary</h1><p class="subtitle">Your selected outlet's verified figures, organized by metric.</p></div><div class="result-actions"><button class="btn secondary" id="backToUpload" type="button">Edit reports</button><button class="btn primary" id="newReports" type="button">New reports</button></div></div>
+<div class="summary"><div class="summary-item"><span>Outlet</span><strong id="resultOutlet"></strong></div><div class="summary-item"><span>Daily date</span><strong class="date-strong" id="resultDate"></strong></div><div class="summary-item"><span>MTD period</span><strong class="date-strong" id="resultPeriod"></strong></div></div>
+<div class="panel"><div class="report-hero"><div><label for="metric" class="field-label">Report category</label><select id="metric"></select></div><div><span class="metric-label">DAY SALE</span><div class="value" id="totalValue">—</div><div class="unit" id="metricUnit"></div></div></div>
+<nav class="metric-navigation" aria-label="Report category navigation"><button class="btn secondary" id="previousMetric" type="button" aria-label="Previous report category">← Previous</button><span class="metric-position" id="metricPosition" role="status" aria-live="polite">1 of 7</span><button class="btn secondary" id="nextMetric" type="button" aria-label="Next report category">Next →</button></nav>
+<table class="data-table"><thead><tr><th scope="col">Channel</th><th scope="col">Value</th></tr></thead><tbody id="resultRows"></tbody></table>
+<div id="resultWarnings" aria-live="polite"></div><p class="footer-note" id="sourceFiles"></p>
+</div>
+<p class="footer-note">Calculated from the original report figures. Results are rounded for display only.</p>
+</section>
 </main>
-<script>
-'use strict';
-const VERSION='3.1.0';
-const OUTLET_TARGET='matara 2';
-const CHANNELS=[{key:'dine',label:'Dine In'},{key:'takeaway',label:'Take Away'},{key:'delivery',label:'Delivery'},{key:'aggregator',label:'Aggregator'},{key:'total',label:'Total'}];
-const DISPLAY_ROWS=[{label:'Dine',sourceIndex:0},{label:'T/Away',sourceIndex:1},{label:'Delivery',sourceIndex:2},{label:'Aggregator',sourceIndex:3},{label:'DAY SALE',sourceIndex:4}];
-const $=s=>document.querySelector(s);
-const escapeHTML=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const cleanText=v=>String(v??'').replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim();
-const normalise=v=>cleanText(v).toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-function iso(y,m,d){const dt=new Date(Date.UTC(y,m-1,d));if(dt.getUTCFullYear()!==y||dt.getUTCMonth()+1!==m||dt.getUTCDate()!==d)return'';return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`}
-function excelDateToken(token,role){const m=String(token||'').match(/(\d{1,2})\s*[/.\-]\s*(\d{1,2})\s*[/.\-]\s*(\d{4})/);if(!m)return'';const a=+m[1],b=+m[2],y=+m[3];let day,month;if(a>12){day=a;month=b}else if(b>12){day=b;month=a}else if(role==='from'&&(a===1||b===1)){day=1;month=a===1?b:a}else{day=a;month=b}return iso(y,month,day)}
-function parseDateRange(rows){const text=rows.flat().map(cleanText).filter(Boolean).join('\n');const fm=text.match(/From\s*Date\s*[:：]?\s*(\d{1,2}\s*[/.\-]\s*\d{1,2}\s*[/.\-]\s*\d{4})/i);const tm=text.match(/To\s*Date\s*[:：]?\s*(\d{1,2}\s*[/.\-]\s*\d{1,2}\s*[/.\-]\s*\d{4})/i);return{from:fm?excelDateToken(fm[1],'from'):'',to:tm?excelDateToken(tm[1],'to'):''}}
-function toNumber(v){if(typeof v==='number')return Number.isFinite(v)?v:NaN;let s=cleanText(v);if(!s||s==='-'||s==='—')return NaN;let neg=false;if(/^\(.*\)$/.test(s)){neg=true;s=s.slice(1,-1)}s=s.replace(/(?:LKR|Rs\.?|රු\.?)/gi,'').replace(/[\s,]/g,'');if(!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(s))return NaN;const n=Number(s);return Number.isFinite(n)?(neg?-n:n):NaN}
-function cents(n){return Math.round((n+Number.EPSILON)*100)}
-function money(n){return Number.isFinite(n)?n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}
-function integer(n){return Number.isFinite(n)?Math.round(n).toLocaleString('en-US'):'—'}
-function rs(n){return `Rs. ${money(n)}`}
-function dateObj(s){if(!s)return null;const [y,m,d]=s.split('-').map(Number);return new Date(Date.UTC(y,m-1,d))}
-function dateFormat(s,options={day:'2-digit',month:'short',year:'numeric'}){const d=dateObj(s);return d?d.toLocaleDateString('en-GB',{...options,timeZone:'UTC'}):'Date unavailable'}
-function dayCount(a,b){if(!a||!b)return NaN;return (Date.parse(b+'T00:00:00Z')-Date.parse(a+'T00:00:00Z'))/86400000+1}
-function colIndex(ref){const letters=(String(ref).match(/^[A-Z]+/i)||[''])[0].toUpperCase();let n=0;for(const ch of letters)n=n*26+ch.charCodeAt(0)-64;return n-1}
-function xmlDoc(text,label){const doc=new DOMParser().parseFromString(text,'application/xml');if(doc.getElementsByTagName('parsererror').length)throw new Error('This workbook contains invalid Excel XML in '+label+'.');return doc}
-function elements(node,localName){return [...node.getElementsByTagNameNS('*',localName)]}
-function normalizeZipPath(path){const parts=[];for(const part of path.replace(/\\/g,'/').split('/')){if(!part||part==='.')continue;if(part==='..')parts.pop();else parts.push(part)}return parts.join('/')}
-function resolveWorkbookPath(target){if(target.startsWith('/'))return normalizeZipPath(target);return normalizeZipPath('xl/'+target)}
-async function readZip(file){if(!window.JSZip)throw new Error('The offline Excel reader could not load. Reload the app once while online, then try again.');let zip;try{zip=await JSZip.loadAsync(await file.arrayBuffer())}catch(e){throw new Error('This file is not a readable Excel workbook. Please save it as .xlsx and upload again.')}return{async get(path){const entry=zip.file(path);return entry?await entry.async('string'):null}}}
-function parseSharedStrings(xmlText){if(!xmlText)return[];const doc=xmlDoc(xmlText,'shared strings');return elements(doc,'si').map(si=>elements(si,'t').map(t=>t.textContent||'').join(''))}
-function xmlSheetRows(xmlText,shared){const doc=xmlDoc(xmlText,'worksheet');const sheetData=elements(doc,'sheetData')[0];if(!sheetData)throw new Error('No worksheet data was found.');const out=[];for(const rowEl of elements(sheetData,'row')){const rowNo=Number(rowEl.getAttribute('r'))||out.length+1;const row=[];for(const c of elements(rowEl,'c')){const ref=c.getAttribute('r')||'';const ci=colIndex(ref);if(ci<0)continue;const type=c.getAttribute('t')||'';let value='';if(type==='inlineStr'){value=elements(c,'t').map(t=>t.textContent||'').join('')}else{const v=elements(c,'v')[0];const raw=v?v.textContent:'';if(type==='s'){const ix=Number(raw);value=Number.isInteger(ix)&&ix>=0?(shared[ix]??''):''}else if(type==='b')value=raw==='1';else if(type==='e')value='';else if(type==='str')value=raw;else if(raw!==''){const n=Number(raw);value=Number.isFinite(n)?n:raw}}row[ci]=value}while(row.length&&row[row.length-1]===undefined)row.pop();out[rowNo-1]=row}return out.map(r=>r||[])}
-function headerCategory(v){const n=normalise(v);if(n==='dine in'||n==='dine')return'dine';if(n==='take away'||n==='takeaway'||n==='t away'||n==='t a')return'takeaway';if(n==='delivery')return'delivery';if(n==='aggregator'||n==='aggregators')return'aggregator';if(n==='total'||n==='grand total')return'total';return''}
-function findReportTable(rows){let head=-1,outletCol=-1,starts={};for(let ri=0;ri<rows.length;ri++){const row=rows[ri]||[];const oi=row.findIndex(v=>normalise(v)==='outlet');const found={};row.forEach((v,ci)=>{const key=headerCategory(v);if(key&&!Number.isInteger(found[key]))found[key]=ci});if(oi>=0&&['dine','takeaway','delivery','aggregator','total'].every(k=>Number.isInteger(found[k]))){head=ri;outletCol=oi;starts=found;break}}
- if(head<0)throw new Error('Expected the outlet sales table was not found. The workbook needs Outlet, Dine In, Take Away, Delivery, Aggregator and Total columns.');
- const sub=rows[head+1]||[],order=['dine','takeaway','delivery','aggregator','total'],columns={};
- for(let i=0;i<order.length;i++){const k=order[i],start=starts[k],end=i+1<order.length?starts[order[i+1]]:Math.max(sub.length,start+2);let qty=-1,sales=-1;for(let c=start;c<end;c++){const n=normalise(sub[c]);if(qty<0&&/^(qty|quantity|count|docs|documents)$/.test(n))qty=c;if(sales<0&&/(net sales|sales amount|amount|value)/.test(n))sales=c}if(qty<0||sales<0){if(end-start>=2){qty=start;sales=start+1}else throw new Error('Could not match Qty and Net Sales columns for '+k+'.')}columns[k]={qty,sales}}
- const candidates=[];for(let r=head+2;r<rows.length;r++){const row=rows[r]||[],outlet=cleanText(row[outletCol]);if(!outlet||/^total$/i.test(outlet)||/^grand total$/i.test(outlet))continue;const v=order.map(k=>[toNumber(row[columns[k].qty]),toNumber(row[columns[k].sales])]);if(v.every(pair=>pair.every(Number.isFinite)))candidates.push({rowIndex:r,outlet,v})}
- if(!candidates.length)throw new Error('The sales table was found, but no complete outlet row could be read.');const exact=candidates.filter(c=>normalise(c.outlet)===OUTLET_TARGET);if(exact.length!==1)throw new Error(exact.length?'The workbook has duplicate Matara 2 rows. Please check the source report.':'The workbook does not contain one unique Matara 2 outlet row. No figures were displayed.');return{head,columns,selected:exact[0],outletCol,candidateCount:candidates.length}}
-async function parseWorkbook(file){if(!/\.(xlsx|xlsm)$/i.test(file.name))throw new Error('Please choose an Excel workbook (.xlsx or .xlsm).');if(file.size>25*1024*1024)throw new Error('This workbook is larger than 25 MB. Save a smaller Excel copy and try again.');if(!file.size)throw new Error('This file is empty. Choose a valid Excel workbook.');const zip=await readZip(file);const workbookXml=await zip.get('xl/workbook.xml'),relsXml=await zip.get('xl/_rels/workbook.xml.rels');if(!workbookXml||!relsXml)throw new Error('Excel workbook metadata is missing. Save the report as .xlsx and upload again.');const wbDoc=xmlDoc(workbookXml,'workbook'),relDoc=xmlDoc(relsXml,'workbook relationships');const relMap=new Map(elements(relDoc,'Relationship').map(r=>[r.getAttribute('Id'),r.getAttribute('Target')]));const sheets=elements(wbDoc,'sheet');if(!sheets.length)throw new Error('No worksheet was found in this workbook.');const shared=parseSharedStrings(await zip.get('xl/sharedStrings.xml'));let parsed=null,parseError=null;for(const sh of sheets){const rid=sh.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id')||sh.getAttribute('r:id')||sh.getAttribute('id');const target=relMap.get(rid);if(!target)continue;const xml=await zip.get(resolveWorkbookPath(target));if(!xml)continue;try{const rows=xmlSheetRows(xml,shared),table=findReportTable(rows),dates=parseDateRange(rows);if(!dates.from||!dates.to)throw new Error('The report table was found, but its From Date / To Date could not be read.');parsed={table,dates,sheet:sh.getAttribute('name')||'Worksheet'};break}catch(err){parseError=err}}
- if(!parsed)throw parseError||new Error('No worksheet contains the expected outlet sales table.');const picked=parsed.table.selected,values=picked.v.map(([q,s])=>[q,s]);for(let k=0;k<values.length;k++){if(!Number.isInteger(values[k][0])||values[k][0]<0)throw new Error(`${CHANNELS[k].label} quantity is missing or invalid.`);if(!Number.isFinite(values[k][1])||values[k][1]<0)throw new Error(`${CHANNELS[k].label} net sales are missing or invalid.`)}return{fileName:file.name,sheet:parsed.sheet,outlet:picked.outlet,from:parsed.dates.from,to:parsed.dates.to,values,rowIndex:picked.rowIndex+1,candidateCount:parsed.table.candidateCount}}
-
-function cents(n){return Math.round((n+Number.EPSILON)*100)}
-const MAX_SALES_DELTA_CENTS=500;
-function reportSalesDeltaCents(report){const channelCents=report.values.slice(0,4).reduce((sum,v)=>sum+cents(v[1]),0);return channelCents-cents(report.values[4][1])}
-function validateReports(){
- const [daily,mtd]=state.reports,errors=[],warnings=[];
- if(!daily||!mtd)return{ok:false,errors:['Upload both reports to begin validation.'],warnings:[]};
- if(daily.from!==daily.to)errors.push('The Daily report must cover exactly one date.');
- if(!mtd.from||mtd.from.slice(8,10)!=='01')errors.push('The MTD report must start on the first day of the month.');
- if(daily.to!==mtd.to)errors.push('The Daily report date must match the MTD report end date.');
- if(daily.to&&mtd.from&&daily.to<mtd.from)errors.push('The Daily report date falls outside the MTD period.');
- if(normalise(daily.outlet)!==normalise(mtd.outlet))errors.push('The two reports do not refer to the same outlet.');
- const numbersValid=report=>Array.isArray(report.values)&&report.values.length===5&&report.values.every(([qty,sales])=>Number.isFinite(qty)&&qty>=0&&Number.isInteger(qty)&&Number.isFinite(sales)&&sales>=0);
- if(!numbersValid(daily)||!numbersValid(mtd))errors.push('A required document count or sales value is missing or invalid.');
- if(numbersValid(daily)&&numbersValid(mtd)){
-  for(const [name,report] of [['Daily',daily],['MTD',mtd]]){
-   const sumQty=report.values.slice(0,4).reduce((sum,value)=>sum+value[0],0);
-   if(sumQty!==report.values[4][0])errors.push(`${name} channel document counts do not exactly equal the Total document count.`);
-   const salesDelta=reportSalesDeltaCents(report);
-   if(Math.abs(salesDelta)>MAX_SALES_DELTA_CENTS){errors.push(`${name} report: channel sales do not add up to the Total (difference Rs. ${money(Math.abs(salesDelta)/100)}).`)}
-   else if(salesDelta!==0){warnings.push(`${name} channel net sales differ from the source Total by Rs. ${money(Math.abs(salesDelta)/100)}; accepted within the Rs. 5.00 tolerance.`)}
-  }
-  for(let i=0;i<5;i++){
-   if(mtd.values[i][0]<daily.values[i][0])errors.push(`${DISPLAY_ROWS[i].label} MTD document count is lower than the Daily count.`);
-   if(cents(mtd.values[i][1])<cents(daily.values[i][1]))errors.push(`${DISPLAY_ROWS[i].label} MTD sales are lower than the Daily sales.`);
-  }
- }
- if(!Number.isFinite(dayCount(mtd.from,mtd.to))||dayCount(mtd.from,mtd.to)<1)errors.push('The MTD date range is invalid.');
- return errors.length?{ok:false,errors:[...new Set(errors)],warnings:[...new Set(warnings)]}:{ok:true,errors:[],warnings:[...new Set(warnings)]};
-}
-function money(value){return Number.isFinite(value)?value.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}
-function integer(value){return Number.isFinite(value)?Math.round(value).toLocaleString('en-US'):'—'}
-function decimal(value){return Number.isFinite(value)?value.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}
-function metricValue(metricId,index){
- const daily=state.reports[0],mtd=state.reports[1],days=dayCount(mtd.from,mtd.to),d=daily.values[index],m=mtd.values[index];
- switch(metricId){
-  case 'noDoc':return d[0];
-  case 'netSales':return d[1];
-  case 'cumulativeSales':return m[1];
-  case 'avgChannel':return m[1]/days;
-  case 'cumDoc':return m[0];
-  case 'avgDoc':return m[0]/days;
-  case 'docAvg':return m[0]===0?null:m[1]/m[0];
-  default:return null;
- }
-}
-function formatMetric(value,kind){if(value===null||!Number.isFinite(value))return'—';if(kind==='integer')return integer(value);if(kind==='decimal')return decimal(value);return money(value)}
-function dateFormat(s,options={day:'2-digit',month:'short',year:'numeric'}){const d=dateObj(s);return d?d.toLocaleDateString('en-GB',{...options,timeZone:'UTC'}):'Date unavailable'}
-const METRICS=[['noDoc','No. Doc'],['netSales','Net Sales'],['cumulativeSales','Cumulative Sales'],['avgChannel','Avg. Channel'],['cumDoc','Cum. Doc'],['avgDoc','Avg. Doc'],['docAvg','Doc Avg.']];
-const state={reports:[null,null],errors:[],busy:false};   // reports[0] = Daily, reports[1] = MTD
-const whole=n=>Number.isFinite(n)?Math.round(n).toLocaleString('en-US'):'0';
-function render(){
-  const[d,m]=state.reports,res=d&&m?validateReports():null,ok=!!(res&&res.ok);
-  $('#pick').hidden=ok;$('#out').hidden=!ok;
-  const msgs=[...state.errors,...(res&&!res.ok?res.errors:[])];
-  $('#msg').hidden=!msgs.length;$('#msg').innerHTML=msgs.map(x=>`<p>${escapeHTML(x)}</p>`).join('');
-  $('#chips').innerHTML=[['Daily',d],['MTD',m]].filter(x=>x[1]).map(([n,r])=>`<li>✓ ${n} report<span>${escapeHTML(r.fileName)}</span></li>`).join('');
-  $('#bigText').textContent=state.busy?'Reading…':!d&&!m?'Choose Daily + MTD reports':!d?'Add the Daily report':!m?'Add the MTD report':'Choose reports again';
-  $('#big').classList.toggle('busy',state.busy);
-  if(!ok)return;
-  const days=dayCount(m.from,m.to);
-  $('#whenDay').textContent='Daily · '+dateFormat(d.to,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-  $('#whenMtd').textContent='MTD · '+dateFormat(m.from,{day:'numeric',month:'short'})+' – '+dateFormat(m.to,{day:'numeric',month:'short'})+' · '+days+' days';
-  $('#cards').innerHTML=METRICS.map(([k,l])=>`<article class="card"><h2>${l}</h2><dl>${DISPLAY_ROWS.map((r,i)=>`<div class="${i===4?'tot':''}"><dt>${r.label}</dt><dd>${whole(metricValue(k,r.sourceIndex))}</dd></div>`).join('')}</dl></article>`).join('');
-  scrollTo(0,0);
-}
-async function addFiles(list){
-  const files=[...list].slice(0,4);if(!files.length)return;
-  state.errors=[];state.busy=true;render();
-  const res=await Promise.allSettled(files.map(parseWorkbook)),got=[];
-  res.forEach((r,i)=>{if(r.status==='fulfilled')got.push(r.value);else state.errors.push(files[i].name+': '+(r.reason&&r.reason.message||'Could not read this file'))});
-  const type=x=>x.from===x.to?0:1;let t=got.map(type);
-  if(got.length===2&&t[0]===0&&t[1]===0&&got.every(x=>x.from.slice(8)==='01'))t=[0,1];   // first day of month: both reports cover the same date
-  const used=new Set();got.forEach((x,i)=>{if(used.has(t[i])){state.errors.push('Choose one Daily report and one MTD report.');return}used.add(t[i]);state.reports[t[i]]=x});
-  state.busy=false;render();
-}
-$('#files').addEventListener('change',e=>{const f=[...e.target.files];e.target.value='';addFiles(f)});
-const pick=$('#pick');pick.addEventListener('dragover',e=>{e.preventDefault();pick.classList.add('drag')});pick.addEventListener('dragleave',()=>pick.classList.remove('drag'));pick.addEventListener('drop',e=>{e.preventDefault();pick.classList.remove('drag');addFiles(e.dataTransfer.files)});
-$('#reset').addEventListener('click',()=>{state.reports=[null,null];state.errors=[];render()});
-render();
-if('serviceWorker'in navigator&&/^https?:$/.test(location.protocol)){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
-</script>
+<div id="settingsOverlay" class="dialog-wrap" hidden><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle"><h2 id="settingsTitle">Saved outlet</h2><p>Select the outlet to use for both reports. Your choice will remain on this device even after clearing reports.</p><label class="field-label" for="settingsOutlet">Outlet name</label><select id="settingsOutlet"></select><div class="actions"><button class="btn primary" type="button" id="confirmSettings">Save selection</button><button class="btn secondary" type="button" id="closeSettings">Cancel</button></div><p class="hint" id="settingsNote"></p></div></div>
 </body>
 </html>

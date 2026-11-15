@@ -1,0 +1,26 @@
+name: DayEnd checks
+on:
+  push:
+    branches:
+      - main
+      - upgrade/dayend-v4-ui-validation
+  pull_request:
+    branches:
+      - main
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check scripts
+        run: |
+          node --check dayend-core.js
+          node --check dayend-app.js
+          node --check sw.js
+      - name: Run regression tests
+        run: node --test tests/core.test.js
