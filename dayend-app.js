@@ -1,4 +1,4 @@
-/* DAY END v4.1.0. Local-only reporting and accessible interface. */
+/* DAY END v4.2.0. Local-only reporting and accessible interface. */
 (function () {
 'use strict';
 const core=window.DayEndCore;
@@ -70,7 +70,7 @@ function renderUpload(){
  for(const [kind,cardId,fileId] of [['daily','dailyCard','dailyFile'],['mtd','mtdCard','mtdFile']]){
   const report=state[kind];
   $(cardId).classList.toggle('ready',!!report);
-  $(fileId).textContent=report?'✓ '+report.fileName:'No file selected';
+  $(fileId).textContent=report?'✓ '+report.fileName:(state.busy&&!report?'Reading file…':'No file selected');
  }
  const result=selectionResult(),messages=$('uploadMessages');
  messages.replaceChildren();
