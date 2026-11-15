@@ -51,7 +51,7 @@ test('cached release uses exact versioned source URLs from HTML',()=>{
 test('dialog provides keyboard focus management and a top-right outlet settings button',()=>{
  assert.match(html,/aria-modal="true"/);
  assert.match(html,/id="settingsOutlet"/);
- assert.match(app,/event\.key==='Tab'/);
+ assert.match(app,/event\.key!=='Tab'/);
  assert.match(app,/event\.key==='Escape'/);
  assert.match(app,/sharedOutlets\(\)/);
 });
