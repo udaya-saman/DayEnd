@@ -62,7 +62,7 @@ test('new report sets reset the metric and navigation remains available',()=>{
  assert.match(app,/\$\('nextMetric'\)\.addEventListener/);
 });
 
-test('app header shows the same PNG icon used by the PWA manifest',()=>{
+test('hero wordmark is a PNG and PWA installation links stay intact',()=>{
  assert.match(html,/<img class="hero-wordmark" src="\.\/icons\/hero-dayend-logo\.png\?v=4\.3\.0"/);
  assert.match(html,/<link rel="icon" type="image\/png" sizes="192x192"/);
  assert.match(html,/<link rel="apple-touch-icon" sizes="180x180"/);
@@ -73,7 +73,7 @@ test('app header shows the same PNG icon used by the PWA manifest',()=>{
 test('reference styling and the faster Excel reader are included in the release',()=>{
  assert.match(html,/main::after/);
  assert.match(html,/main::before/);
- assert.match(html,/\.top\{background:linear-gradient/);
+ assert.match(html,/\.top\{[^}]*background:linear-gradient/);
  assert.match(html,/<th scope="col">Value \(Rs\.\)<\/th>/);
  assert.match(sw,/excel-unpack-worker\.js\?v=4\.3\.0/);
  assert.match(readFileSync(join(root,'dayend-core.js'),'utf8'),/new Worker\('\.\/excel-unpack-worker\.js\?v=4\.3\.0'\)/);
@@ -91,7 +91,7 @@ test('full-height screens, smooth scalable footer curves, and accessible brand i
 });
 test('previous and next navigation have matching grid columns and decorative arrows',()=>{
  assert.match(html,/grid-template-columns:minmax\(0,1fr\) auto minmax\(0,1fr\)/);
- assert.match(html,/#previousMetric" type="button"><span class="nav-arrow"/);
- assert.match(html,/#nextMetric" type="button"><span>Next<\/span><span class="nav-arrow"/);
+ assert.match(html,/id="previousMetric" type="button"><span class="nav-arrow"/);
+ assert.match(html,/id="nextMetric" type="button"><span>Next<\/span><span class="nav-arrow"/);
  assert.match(html,/font-size:clamp\(14px,2vw,16px\)/);
 });
