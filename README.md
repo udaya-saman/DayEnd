@@ -1,4 +1,4 @@
-# DAY END v4.1.0
+# DAY END v4.1.1
 
 A lightweight, mobile-first, offline-capable Pizza Hut outlet reporting web app for GitHub Pages.
 
@@ -71,3 +71,14 @@ Validation requires exact document-count reconciliation and accepts sales total 
 - Footer: **Designed and developed by Udaya Saman | 071 969 8799**.
 - The top-right outlet settings dialog keeps keyboard focus inside while open, and disables outlet choices missing from either uploaded workbook.
 - New report sets reset the selected report category to **No. Doc**.
+
+## PNG app icon set (v4.1.1)
+
+Branded red/white square PNG assets replace the previous launch icons:
+
+- `icons/icon-192.png`: Android/PWA 192×192.
+- `icons/icon-512.png`: large PWA 512×512.
+- `icons/maskable-512.png`: launch icon with safe central artwork, 512×512.
+- `icons/apple-touch-icon.png`: iOS Home Screen icon, 180×180.
+
+The application header and site icon use the same branded design. The offline cache was bumped to ensure returning users receive the new artwork.
