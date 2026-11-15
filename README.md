@@ -1,4 +1,4 @@
-# DAY END v4.1.1
+# DAY END v4.2.0
 
 A lightweight, mobile-first, offline-capable Pizza Hut outlet reporting web app for GitHub Pages.
 
@@ -82,3 +82,12 @@ Branded red/white square PNG assets replace the previous launch icons:
 - `icons/apple-touch-icon.png`: iOS Home Screen icon, 180×180.
 
 The application header and site icon use the same branded design. The offline cache was bumped to ensure returning users receive the new artwork.
+
+## v4.2.0 reference-matched redesign and faster imports
+
+- Red gradient app header, white inset panel, attractive red curved footer, polished upload cards, and branded red results controls styled to match the supplied visual reference.
+- The Excel ZIP is unpacked in a local Web Worker (excel-unpack-worker.js), reducing main-thread pauses while reading files.
+- Dates are searched in the first 150 worksheet rows first, falling back to the rest when necessary, without changing report formulas.
+- A fallback inline unpacking path is retained for environments that block workers. Original workbook limits and validation logic remain in place.
+- The offline service worker precaches the new worker and versioned scripts for offline processing.
+- Large Excel files can still take time while parsing their XML. This improves responsiveness, not an instantaneous import.
