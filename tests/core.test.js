@@ -117,3 +117,30 @@ test('Previous and Next wrap correctly at the first and last metrics',()=>{
   assert.equal(core.adjacentMetric(last,1),first);
   assert.equal(core.adjacentMetric(first,0),first);
 });
+
+test('combines outlets across worksheets from the same reporting period',()=>{
+ const a=makeReport('2026-11-01','2026-11-02');
+ const b=makeReport('2026-11-01','2026-11-02',{name:'Tangalle'});
+ const combined=core.combineSheets([
+  {sheet:'South A',from:a.from,to:a.to,outlets:a.outlets},
+  {sheet:'South B',from:b.from,to:b.to,outlets:b.outlets}
+ ],'sample.xlsx');
+ assert.equal(combined.outlets.length,2);
+ assert.equal(combined.sheet,'South A, South B');
+ assert.equal(core.lookup(combined,'Tangalle').name,'Tangalle');
+});
+test('rejects ambiguous worksheets with conflicting periods',()=>{
+ const first=makeReport('2026-11-01','2026-11-02');
+ const second=makeReport('2026-10-01','2026-10-31',{name:'Tangalle'});
+ assert.throws(()=>core.combineSheets([
+  {sheet:'Old',from:second.from,to:second.to,outlets:second.outlets},
+  {sheet:'Current',from:first.from,to:first.to,outlets:first.outlets}
+ ],'mixed.xlsx'),/different dates/);
+});
+test('rejects duplicate outlets across worksheets',()=>{
+ const sheet=makeReport('2026-11-01','2026-11-02');
+ assert.throws(()=>core.combineSheets([
+  {sheet:'First',from:sheet.from,to:sheet.to,outlets:sheet.outlets},
+  {sheet:'Second',from:sheet.from,to:sheet.to,outlets:sheet.outlets}
+ ],'duplicate.xlsx'),/more than one report sheet/);
+});

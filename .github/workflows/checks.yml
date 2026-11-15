@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - upgrade/dayend-v4-ui-validation
+      - upgrade/dayend-v4.1-clean-ui
   pull_request:
     branches:
       - main
@@ -23,4 +24,4 @@ jobs:
           node --check dayend-app.js
           node --check sw.js
       - name: Run regression tests
-        run: node --test tests/core.test.js
+        run: node --test tests/*.test.js
