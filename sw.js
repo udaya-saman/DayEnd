@@ -1,10 +1,10 @@
 'use strict';
 /* Cache a complete release atomically. All app routes and scripts read from the same version. */
-const CACHE='day-end-4.1.0';
+const CACHE='day-end-4.1.1';
 const CORE=[
  './','./index.html','./dayend-core.js?v=4.1.0','./dayend-app.js?v=4.1.0',
- './manifest.json?v=4.1.0','./vendor/jszip.min.js',
- './icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./icons/maskable-512.png'
+ './manifest.json?v=4.1.1','./vendor/jszip.min.js',
+ './icons/icon-192.png','./icons/icon-192.png?v=4.1.1','./icons/icon-512.png','./icons/apple-touch-icon.png','./icons/apple-touch-icon.png?v=4.1.1','./icons/maskable-512.png'
 ];
 self.addEventListener('install',event=>{
  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));
