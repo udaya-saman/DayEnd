@@ -54,7 +54,8 @@ test('outlet display uses sheet-derived data without manual settings',()=>{
  assert.match(html,/\.outlet-display span\{[^}]*font-size:19\.5px/);
  assert.match(html,/\.outlet-display span\{font-size:16\.5px/);
  assert.match(app,/core\.detectOutlet\(state\.daily,state\.mtd\)/);
- assert.doesNotMatch(app,/localStorage|openOutletDialog|openSettings|openGear|settingsOverlay/);
+ assert.doesNotMatch(app,/openOutletDialog|openSettings|openGear|settingsOverlay/);
+ assert.match(app,/localStorage.getItem\('dayend.outlet.v4'\)/);
 });
 test('new report sets reset the metric and navigation remains available',()=>{
  assert.match(app,/function firstMetric\(\)/);
