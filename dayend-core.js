@@ -1,4 +1,4 @@
-/* DAY END v4.4.0. Pure calculations and Excel report reader. */
+/* DAY END v4.4.2. Pure calculations and Excel report reader. */
 (function (root, factory) {
   'use strict';
   var api = factory();
@@ -6,7 +6,7 @@
   else root.DayEndCore = api;
 })(typeof window !== 'undefined' ? window : this, function () {
   'use strict';
-  var VERSION = '4.4.0';
+  var VERSION = '4.4.2';
   var TOLERANCE_CENTS = 500;
   var CHANNELS = [
     {key:'dine', label:'Dine'}, {key:'takeaway',label:'T/Away'},
@@ -204,7 +204,7 @@
     if(typeof Worker!=='undefined'){
       try {
         sources=await new Promise(function(resolve,reject){
-          var worker=new Worker('./excel-unpack-worker.js?v=4.4.0');
+          var worker=new Worker('./excel-unpack-worker.js?v=4.4.2');
           var timer=setTimeout(function(){worker.terminate();reject(Error('The file took too long to read. Please try a smaller Excel export.'));},30000);
           worker.onmessage=function(event){
             clearTimeout(timer);worker.terminate();
@@ -296,7 +296,7 @@
     return matches[0]||null;
   }
   function validate(daily,mtd,outlet) {
-    var errors=[],warnings=[],d=null,m=null, label=clean(outlet);
+    var errors=[],d=null,m=null, label=clean(outlet);
     if(!daily||!mtd)return {ok:false,errors:['Add both the Daily and MTD reports.'],warnings:[]};
     if(!label)errors.push('Select an outlet first.');
     try {d=lookup(daily,label);m=lookup(mtd,label);} catch(err){errors.push(err.message);}
@@ -319,14 +319,13 @@
         if(qty!==v[4][0])errors.push(item.name+' document counts do not match the Total.');
         var diff=v.slice(0,4).reduce(function(sum,p){return sum+cents(p[1]);},0)-cents(v[4][1]);
         if(Math.abs(diff)>TOLERANCE_CENTS)errors.push(item.name+' sales do not match the Total (Rs. '+formatMoney(Math.abs(diff)/100)+' difference).');
-        else if(diff!==0)warnings.push(item.name+' sales have a Rs. '+formatMoney(Math.abs(diff)/100)+' difference, accepted within the Rs. 5.00 limit.');
       });
       for(var i=0;i<5;i++){
         if(m.values[i][0]<d.values[i][0])errors.push(CHANNELS[i].label+' MTD documents are lower than Daily documents.');
         if(cents(m.values[i][1])<cents(d.values[i][1]))errors.push(CHANNELS[i].label+' MTD sales are lower than Daily sales.');
       }
     }
-    return {ok:errors.length===0,errors:Array.from(new Set(errors)),warnings:Array.from(new Set(warnings)),daily:d,mtd:m,days:days};
+    return {ok:errors.length===0,errors:Array.from(new Set(errors)),warnings:[],daily:d,mtd:m,days:days};
   }
   function metricValue(key,index,daily,mtd,days) {
     var d=daily.values[index],m=mtd.values[index];
