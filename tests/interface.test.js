@@ -46,7 +46,7 @@ test('cached release uses exact versioned source URLs from HTML',()=>{
  const resources=[...html.matchAll(/<(?:script|link)[^>]+(?:src|href)="(\.\/(?:dayend-|manifest)[^"]+)"/g)].map(m=>m[1]);
  assert.ok(resources.length>=3);
  for(const resource of resources)assert.ok(sw.includes("'"+resource+"'"),resource+' is missing from the offline cache');
- assert.match(sw,/const CACHE='day-end-4\.4\.0'/);
+ assert.match(sw,/const CACHE='day-end-4\.4\.1'/);
  assert.doesNotMatch(sw,/cache\.put\('\.\/index\.html'/);
 });
 test('outlet display uses sheet-derived data without manual settings',()=>{
@@ -114,4 +114,14 @@ test('balanced upload and result panels retain safe internal scrolling',()=>{
  assert.match(html,/#resultScreen\{justify-content:center;padding-bottom:clamp/);
  assert.match(html,/#resultScreen \.panel\{padding:clamp/);
  assert.match(html,/max-height:100%;overflow-y:auto/);
+});
+
+test('accepted sales differences are silent on both screens, without changing validation',()=>{
+ assert.doesNotMatch(app,/Sales difference accepted|Accepted with a small difference/);
+ assert.doesNotMatch(app,/result\.warnings\.length/);
+ assert.doesNotMatch(html,/id="resultWarnings"/);
+ const core=readFileSync(join(root,'dayend-core.js'),'utf8');
+ assert.match(core,/TOLERANCE_CENTS = 500/);
+ assert.match(core,/Math\.abs\(diff\)>TOLERANCE_CENTS/);
+ assert.match(core,/warnings\.push\(item\.name\+' sales have a Rs\./);
 });
