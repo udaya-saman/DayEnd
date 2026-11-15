@@ -50,7 +50,10 @@ test('cached release uses exact versioned source URLs from HTML',()=>{
  assert.doesNotMatch(sw,/cache\.put\('\.\/index\.html'/);
 });
 test('outlet display uses sheet-derived data without manual settings',()=>{
- assert.match(html,/id="outletName">Awaiting outlet/);
+ assert.match(html,/class="outlet-display"[^>]*hidden><span id="outletName"><\/span>/);
+ assert.match(app,/\$\(\x27outletName\x27\)\.textContent=found\.name\|\|\x27\x27/);
+ assert.match(app,/\$\(\x27outletName\x27\)\.parentElement\.hidden=!found\.name/);
+ assert.doesNotMatch(html,/Awaiting outlet/);
  assert.match(html,/\.outlet-display span\{[^}]*font-size:19\.5px/);
  assert.match(html,/\.outlet-display span\{font-size:16\.5px/);
  assert.match(app,/core\.detectOutlet\(state\.daily,state\.mtd,state\.preferredOutlet\)/);
