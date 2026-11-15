@@ -1,4 +1,4 @@
-# DAY END v4.4.1
+# DAY END v4.4.2
 
 A lightweight, mobile-first, offline-capable Pizza Hut outlet reporting web app for GitHub Pages.
 
@@ -114,3 +114,10 @@ The application header and site icon use the same branded design. The offline ca
 ## v4.4.1
 
 - Removed the accepted sales difference notification from both the upload and results screens. Differences of Rs. 5.00 or less still pass without a banner; discrepancies over Rs. 5.00 still block the report with an error. No calculations or other UI behavior changed.
+
+## v4.4.2 — stale offline warning fix
+
+- Remove acceptance-warning text at its source: the calculation engine now returns an empty `warnings` list for differences within Rs. 5.00; differences above that threshold still produce errors.
+- Switch the PWA service worker from cache-first to network-first navigation, with a cached offline fallback. When online, refreshing the app can retrieve current HTML instead of being pinned to outdated HTML.
+- Refresh script and worker query versions in the offline release cache, and explicitly check for service worker updates after loading the app.
+- Existing installed clients may need to close and reopen once to let the new worker take control; current file uploads should never be forcibly interrupted by an automatic reload.
