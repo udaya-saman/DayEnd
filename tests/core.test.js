@@ -31,7 +31,7 @@ test('accepts Rs. 5 exactly, but rejects differences above Rs. 5',()=>{
  const mtd=makeReport('2026-11-01','2026-11-02',{sales:[400,500,600,705,2200],qty:[4,5,6,7,22]});
  let result=core.validate(daily,mtd,'Matara 2');
  assert.equal(result.ok,true,JSON.stringify(result.errors));
- assert.equal(result.warnings.length,2);
+ assert.deepEqual(result.warnings,[]);
  daily.outlets[0].values[3][1]=405.01;
  result=core.validate(daily,mtd,'Matara 2');
  assert.equal(result.ok,false);
@@ -186,4 +186,14 @@ test('a previously selected outlet is used only when the new report contains it'
  const unknown=core.detectOutlet(daily,mtd,'Akuressa');
  assert.equal(unknown.name,'');
  assert.match(unknown.error,/more than one matching outlet/);
+});
+
+test('accepted differences never produce a warning text; > Rs. 5 still fails',()=>{
+ const day=makeReport('2026-11-02','2026-11-02',{sales:[100,200,300,405,1000]});
+ const mtd=makeReport('2026-11-01','2026-11-02',{sales:[400,500,600,705,2200],qty:[4,5,6,7,22]});
+ const accepted=core.validate(day,mtd,'Matara 2');
+ assert.equal(accepted.ok,true);
+ assert.deepEqual(accepted.warnings,[]);
+ day.outlets[0].values[3][1]=405.01;
+ assert.equal(core.validate(day,mtd,'Matara 2').ok,false);
 });
