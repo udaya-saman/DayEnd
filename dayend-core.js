@@ -165,6 +165,21 @@
     if(!path.startsWith('xl/'))throw Error('This Excel file contains an unsafe worksheet link.');
     return path;
   }
+  function combineSheets(candidates,fileName) {
+    if(!candidates.length)throw Error('No worksheet contains the expected sales report.');
+    var expected=candidates[0],merged=[],found=new Set(),sheetNames=[];
+    candidates.forEach(function(candidate){
+      if(candidate.from!==expected.from||candidate.to!==expected.to){
+        throw Error('The workbook contains report sheets for different dates. Export one reporting period at a time.');
+      }
+      sheetNames.push(candidate.sheet);
+      candidate.outlets.forEach(function(row){
+        if(found.has(row.key))throw Error('The outlet '+row.name+' appears on more than one report sheet. Export only one matching report.');
+        found.add(row.key);merged.push(row);
+      });
+    });
+    return {fileName:fileName,sheet:sheetNames.join(', '),from:expected.from,to:expected.to,outlets:merged};
+  }
   async function readWorkbook(file,order) {
     if(!file||!/\.(xlsx|xlsm)$/i.test(file.name||''))throw Error('Choose an Excel report ending in .xlsx or .xlsm.');
     if(!file.size||file.size>25*1024*1024)throw Error('The report is empty or larger than 25 MB.');
@@ -207,18 +222,7 @@
       } catch(err){lastError=err;}
     }
     if(!candidates.length)throw lastError||Error('No worksheet contains the expected sales report.');
-    var expected=candidates[0],merged=[],found=new Set(),sheetNames=[];
-    candidates.forEach(function(candidate){
-      if(candidate.from!==expected.from||candidate.to!==expected.to){
-        throw Error('The workbook contains report sheets for different dates. Export one reporting period at a time.');
-      }
-      sheetNames.push(candidate.sheet);
-      candidate.outlets.forEach(function(row){
-        if(found.has(row.key))throw Error('The outlet '+row.name+' appears on more than one report sheet. Export only one matching report.');
-        found.add(row.key);merged.push(row);
-      });
-    });
-    return {fileName:file.name,sheet:sheetNames.join(', '),from:expected.from,to:expected.to,outlets:merged};
+    return combineSheets(candidates,file.name);
   }
   function lookup(report,name){
     if(!report||!report.outlets)return null;
@@ -278,5 +282,5 @@
   return {VERSION:VERSION,CHANNELS:CHANNELS,adjacentMetric:adjacentMetric,METRICS:METRICS,TOLERANCE_CENTS:TOLERANCE_CENTS,
     clean:clean,outletKey:outletKey,iso:iso,parseDateToken:parseDateToken,parseDateRange:parseDateRange,dayCount:dayCount,
     cents:cents,formatNumber:formatNumber,formatMoney:formatMoney,toNumber:toNumber,
-    findTable:findTable,parseSheetRows:parseSheetRows,readWorkbook:readWorkbook,lookup:lookup,validate:validate,metricValue:metricValue};
+    findTable:findTable,parseSheetRows:parseSheetRows,combineSheets:combineSheets,readWorkbook:readWorkbook,lookup:lookup,validate:validate,metricValue:metricValue};
 });
