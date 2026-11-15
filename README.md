@@ -1,4 +1,4 @@
-# DAY END v4.0.1
+# DAY END v4.1.0
 
 A lightweight, mobile-first, offline-capable Pizza Hut outlet reporting web app for GitHub Pages.
 
@@ -7,19 +7,20 @@ A lightweight, mobile-first, offline-capable Pizza Hut outlet reporting web app 
 - Two-screen workflow: choose the **Daily** and **MTD** Excel files separately; validated results open automatically.
 - Saved outlet selection, with a settings dialog for changes. Selection uses `localStorage` and survives **New reports** and app restarts. `Matara 2` and `Matara 02` are treated as the same outlet when matching Excel report rows.
 - Report-dependent outlets found in uploaded workbooks are also offered, alongside the default outlet names.
+- A compact, modern two-screen design with only the necessary upload and results controls, and a clear developer credit.
 - One report category at a time, with five channels (Dine, T/Away, Delivery, Aggregator, DAY SALE).
 - Better error messages, visible accepted-tolerance warnings, original filenames in the summary, and no background file uploads.
-- Safer worksheet parsing, strict column identification, cross-report reconciliation, MTD same-month checks, and explicit file roles to handle the first day of a month.
+- Safer worksheet parsing across worksheets, rejection of conflicting reporting dates or duplicate outlet rows, strict column identification, cross-report reconciliation, MTD same-month checks, and explicit file roles to handle the first day of a month.
 - Automated unit tests and updated service worker cache.
 
 ## Using the app
 
 1. Open the app online at least once and let it finish loading before using it offline.
-2. Choose your outlet using the **Outlet** selection or the settings button. The choice is saved in the browser.
+2. Choose your outlet using the **top-right outlet settings button**. The choice is saved in this browser.
 3. Upload one Excel workbook to **Daily report** and one to **MTD report**.
 4. When the files and chosen outlet validate, the results screen opens.
-5. Select a reporting category from the dropdown, or tap **Previous** and **Next** to browse all seven metrics. The dropdown and displayed values stay synchronized. Navigation wraps from the last category to the first and vice versa.
-6. Choose **Edit reports** to change a workbook, or **New reports** to start again. Neither clears the saved outlet.
+5. Choose a report category in the dropdown, or use **Previous** and **Next** to navigate all seven metrics. The dropdown and table remain synchronized; navigation wraps around.
+6. Choose **Edit Reports** to change a workbook, or **New Reports** to start again. Neither clears the saved outlet.
 
 ## Formulas (unchanged)
 
@@ -51,9 +52,9 @@ Validation requires exact document-count reconciliation and accepts sales total 
 
 - Pure calculation/reader module: `dayend-core.js`.
 - Interface logic: `dayend-app.js`.
-- Offline assets: `sw.js`.
+- Offline assets: `sw.js`; cache is versioned and precaches the same script URLs referenced by the HTML, with cache-first navigation for consistent releases.
 - No build step; bundled JSZip works offline.
-- `node --test tests/core.test.js` runs the regression tests locally in Node 20+.
+- `node --test tests/*.test.js` runs the regression tests locally in Node 20+.
 - Pages deploys from `main`. Development happens on a separate branch and must be reviewed and merged to go live.
 
 ## Known limits / release checklist
@@ -62,3 +63,11 @@ Validation requires exact document-count reconciliation and accepts sales total 
 - Manual device checks are still needed for installed iPhone Safari and Android Chrome, offline reload, and update from the old cache.
 - Changing browser/site data, or using a different browser/device, can erase the saved outlet. `localStorage` persistence applies to the same browser and origin.
 - Only formatted source exports with the expected report layout are supported. The reader intentionally rejects layouts it cannot confidently identify.
+
+## Version 4.1 interface
+
+- Upload screen: no introductory hero, progress stepper, or duplicate outlet selector.
+- Results screen: no banner, summary cards, cumulative highlight or extra data-source display; category dropdown, navigation buttons, channel table and report actions remain.
+- Footer: **Designed and developed by Udaya Saman | 071 969 8799**.
+- The top-right outlet settings dialog keeps keyboard focus inside while open, and disables outlet choices missing from either uploaded workbook.
+- New report sets reset the selected report category to **No. Doc**.
