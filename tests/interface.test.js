@@ -14,7 +14,7 @@ function inSection(id) {
 }
 test('upload page starts with the requested upload panel and no intro or duplicate outlet controls',()=>{
  const screen=inSection('uploadScreen');
- assert.match(screen,/<h1 id="uploadTitle">Upload Excel Reports<\/h1>/);
+ assert.match(screen,/<h1 id="uploadTitle">[\s\S]*?Upload Excel Reports<\/h1>/);
  assert.doesNotMatch(screen,/class="intro"|class="steps"|id="outletSelect"|id="saveOutlet"/);
  assert.ok(screen.indexOf('Upload Excel Reports')<screen.indexOf('dailyCard'));
  assert.match(html,/<button class="outlet-button"[^>]*id="openSettings"/);
@@ -45,7 +45,7 @@ test('cached release uses exact versioned source URLs from HTML',()=>{
  const resources=[...html.matchAll(/<(?:script|link)[^>]+(?:src|href)="(\.\/(?:dayend-|manifest)[^"]+)"/g)].map(m=>m[1]);
  assert.ok(resources.length>=3);
  for(const resource of resources)assert.ok(sw.includes("'"+resource+"'"),resource+' is missing from the offline cache');
- assert.match(sw,/const CACHE='day-end-4\.1\.1'/);
+ assert.match(sw,/const CACHE='day-end-4\.2\.0'/);
  assert.doesNotMatch(sw,/cache\.put\('\.\/index\.html'/);
 });
 test('dialog provides keyboard focus management and a top-right outlet settings button',()=>{
@@ -63,8 +63,17 @@ test('new report sets reset the metric and navigation remains available',()=>{
 });
 
 test('app header shows the same PNG icon used by the PWA manifest',()=>{
- assert.match(html,/<img class="brand-mark" src="\.\/icons\/icon-192\.png\?v=4\.1\.1"/);
+ assert.match(html,/<img class="brand-mark" src="\.\/icons\/icon-192\.png\?v=4\.2\.0"/);
  assert.match(html,/<link rel="icon" type="image\/png" sizes="192x192"/);
  assert.match(html,/<link rel="apple-touch-icon" sizes="180x180"/);
  assert.ok(!html.includes('<svg class="brand-mark"'));
+});
+
+test('reference styling and the faster Excel reader are included in the release',()=>{
+ assert.match(html,/main::after/);
+ assert.match(html,/main::before/);
+ assert.match(html,/\.top\{background:linear-gradient/);
+ assert.match(html,/<th scope="col">Value \(Rs\.\)<\/th>/);
+ assert.match(sw,/excel-unpack-worker\.js\?v=4\.2\.0/);
+ assert.match(readFileSync(join(root,'dayend-core.js'),'utf8'),/new Worker\('\.\/excel-unpack-worker\.js\?v=4\.2\.0'\)/);
 });
