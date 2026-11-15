@@ -9,9 +9,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="DAY END">
 <title>DAY END | Outlet reports</title>
-<link rel="manifest" href="./manifest.json?v=4.3.0">
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=4.3.0">
-<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=4.3.0">
+<link rel="manifest" href="./manifest.json?v=4.4.0">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png?v=4.4.0">
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png?v=4.4.0">
 <style>
 
 :root{--red:#c70716;--red-dark:#90000c;--red-soft:#fff0f2;--ink:#191b25;--muted:#697282;--line:#e4e6ed;--white:#fff;--focus:#ffce6c;--success:#137c45;--shadow:0 12px 33px rgba(45,37,55,.09);--radius:22px;--wave-height:clamp(62px,11dvh,112px)}
@@ -142,13 +142,46 @@ select{height:41px}
 @media(max-height:555px){.note{display:none}.upload-card{min-height:92px}.upload-icon{height:28px;width:28px}.upload-hint{display:none}.file-name{padding:3px 6px}.panel-heading{margin-bottom:5px}.metric-navigation .btn{min-height:35px}.credit{display:none}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 
+
+/* v4.4: sheet-driven outlet and more balanced card proportions */
+.top-inner{align-items:center;padding-bottom:clamp(30px,5.2dvh,56px)}
+.outlet-display{display:flex;align-items:center;justify-content:center;max-width:52%;min-width:0;min-height:47px;padding:10px 15px;border:1px solid #ffffff45;border-radius:16px;background:#ffffff12;box-shadow:inset 0 1px #ffffff24;color:#fff;text-align:center}
+.outlet-display span{display:block;max-width:100%;font-size:19.5px;line-height:1.22;font-weight:850;letter-spacing:.005em;overflow-wrap:anywhere}
+#uploadScreen{justify-content:center;padding-bottom:clamp(11px,2.5dvh,26px)}
+#uploadScreen .panel{margin-top:0;padding:clamp(22px,3.5dvh,34px) clamp(18px,3.2vw,30px) clamp(28px,4.6dvh,42px)}
+#uploadScreen .panel-heading{margin-bottom:clamp(17px,3dvh,29px)}
+#uploadScreen .upload-grid{gap:clamp(11px,2.2vw,20px)}
+#uploadScreen .upload-card{padding:clamp(14px,2.6dvh,25px) clamp(9px,1.8vw,18px);gap:clamp(7px,1.2dvh,13px)}
+#uploadScreen .actions{margin-top:clamp(18px,3dvh,29px)}
+#resultScreen{justify-content:center;padding-bottom:clamp(9px,2dvh,19px)}
+#resultScreen .panel{padding:clamp(20px,3.1dvh,31px) clamp(18px,3.2vw,30px) clamp(24px,4dvh,36px)}
+#resultScreen .metric-navigation{padding-block:clamp(14px,2.4dvh,24px)}
+#resultScreen .result-actions{margin-top:clamp(15px,2.4dvh,25px)}
+@media(max-width:620px){
+ .top-inner{padding-bottom:clamp(28px,4.9dvh,47px)}
+ .outlet-display{max-width:53%;min-height:42px;padding:8px 10px;border-radius:12px}
+ .outlet-display span{font-size:16.5px}
+ #uploadScreen .panel{padding:clamp(18px,2.8dvh,26px) clamp(13px,2.5vw,20px) clamp(23px,3.4dvh,31px)}
+ #uploadScreen .upload-card{padding:clamp(11px,1.9dvh,18px) 7px}
+ #resultScreen .panel{padding:clamp(15px,2.6dvh,23px) 14px clamp(18px,3dvh,28px)}
+}
+@media(max-height:720px){
+ #uploadScreen .panel{padding:13px 14px 17px}
+ #uploadScreen .panel-heading{margin-bottom:9px}
+ #uploadScreen .upload-card{padding:8px 5px;gap:4px}
+ #uploadScreen .actions{margin-top:11px}
+ #resultScreen .panel{padding:12px 14px 15px}
+ #resultScreen .metric-navigation{padding-block:9px}
+ #resultScreen .result-actions{margin-top:10px}
+}
+
 </style>
 <script defer src="./vendor/jszip.min.js"></script>
-<script defer src="./dayend-core.js?v=4.3.0"></script>
-<script defer src="./dayend-app.js?v=4.3.0"></script>
+<script defer src="./dayend-core.js?v=4.4.0"></script>
+<script defer src="./dayend-app.js?v=4.4.0"></script>
 </head>
 <body>
-<header class="top"><div class="shell top-inner"><div class="brand" aria-label="DAY END"><img class="hero-wordmark" src="./icons/hero-dayend-logo.png?v=4.3.0" width="150" height="68" alt="DAY END"></div><div class="top-tools"><button class="outlet-button" type="button" id="openSettings" aria-label="Change outlet" aria-haspopup="dialog"><span id="outletName">Matara 02</span><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7" stroke-linejoin="round" stroke-linecap="round"/></svg></button><button class="settings-gear" type="button" id="openGear" aria-label="Outlet settings" aria-haspopup="dialog"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8.25a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5Z"/><path d="M19.2 13.7a7.8 7.8 0 0 0 0-3.4l2-1.5-2-3.5-2.35 1a7.8 7.8 0 0 0-2.9-1.68L13.6 2h-4l-.36 2.62a7.8 7.8 0 0 0-2.9 1.68l-2.35-1-2 3.5 2 1.5a7.8 7.8 0 0 0 0 3.4l-2 1.5 2 3.5 2.35-1a7.8 7.8 0 0 0 2.9 1.68L9.6 22h4l.36-2.62a7.8 7.8 0 0 0 2.9-1.68l2.35 1 2-3.5-2-1.5Z"/></svg></button></div></div></header>
+<header class="top"><div class="shell top-inner"><div class="brand" aria-label="DAY END"><img class="hero-wordmark" src="./icons/hero-dayend-logo.png?v=4.4.0" width="150" height="68" alt="DAY END"></div><div class="outlet-display" aria-live="polite" aria-atomic="true"><span id="outletName">Awaiting outlet</span></div></div></header>
 <main class="shell">
 <section id="uploadScreen" aria-labelledby="uploadTitle">
 <div class="panel">
@@ -185,15 +218,5 @@ select{height:41px}
  <path fill="url(#waveFront)" d="M0 54 C135 115 288 112 439 65 C517 39 562 38 600 42 L600 112 L0 112 Z"/>
 </svg>
 </main>
-<div id="settingsOverlay" class="dialog-wrap" hidden>
-<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-describedby="settingsDescription">
-<h2 id="settingsTitle">Choose outlet</h2>
-<p id="settingsDescription">Your selection is saved on this device and used for both reports.</p>
-<label class="field-label" for="settingsOutlet">Outlet</label>
-<select id="settingsOutlet"></select>
-<p id="settingsNote" class="hint" aria-live="polite"></p>
-<div class="actions"><button class="btn primary" type="button" id="confirmSettings">Save Outlet</button><button class="btn secondary" type="button" id="closeSettings">Cancel</button></div>
-</div>
-</div>
 </body>
 </html>
