@@ -1,4 +1,4 @@
-/* DAY END v4.0.0. Pure calculations and Excel report reader. */
+/* DAY END v4.1.0. Pure calculations and Excel report reader. */
 (function (root, factory) {
   'use strict';
   var api = factory();
@@ -6,7 +6,7 @@
   else root.DayEndCore = api;
 })(typeof window !== 'undefined' ? window : this, function () {
   'use strict';
-  var VERSION = '4.0.0';
+  var VERSION = '4.1.0';
   var TOLERANCE_CENTS = 500;
   var CHANNELS = [
     {key:'dine', label:'Dine'}, {key:'takeaway',label:'T/Away'},
@@ -33,7 +33,10 @@
     if (match) return iso(+match[1],+match[2],+match[3]);
     match = s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/);
     if (!match) return '';
-    return (order === 'MDY') ? iso(+match[3],+match[1],+match[2]) : iso(+match[3],+match[2],+match[1]);
+    var dayFirst=iso(+match[3],+match[2],+match[1]);
+    var monthFirst=iso(+match[3],+match[1],+match[2]);
+    if(order==='MDY')return monthFirst;
+    return dayFirst;
   }
   function parseDateRange(rows, order) {
     var text = rows.flat().map(clean).filter(Boolean).join(' ');
@@ -192,7 +195,7 @@
     var sheets=elems(wbDoc,'sheet');
     if(!sheets.length||sheets.length>50)throw Error('The workbook has an unsupported number of worksheets.');
     var shared=parseSharedStrings(await read('xl/sharedStrings.xml',12*1024*1024));
-    var lastError;
+    var lastError, candidates=[];
     for(var i=0;i<sheets.length;i++){
       var sheet=sheets[i],rid=sheet.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id')||sheet.getAttribute('r:id');
       var target=relMap.get(rid);if(!target)continue;
@@ -200,10 +203,22 @@
       try {
         var rows=parseSheetRows(xml,shared),outlets=findTable(rows),dates=parseDateRange(rows,order||'DMY');
         if(!dates.from||!dates.to)throw Error('The report dates could not be read. Check the date format in the file.');
-        return {fileName:file.name,sheet:sheet.getAttribute('name')||'Worksheet',from:dates.from,to:dates.to,outlets:outlets};
+        candidates.push({sheet:sheet.getAttribute('name')||'Worksheet',from:dates.from,to:dates.to,outlets:outlets});
       } catch(err){lastError=err;}
     }
-    throw lastError||Error('No worksheet contains the expected sales report.');
+    if(!candidates.length)throw lastError||Error('No worksheet contains the expected sales report.');
+    var expected=candidates[0],merged=[],found=new Set(),sheetNames=[];
+    candidates.forEach(function(candidate){
+      if(candidate.from!==expected.from||candidate.to!==expected.to){
+        throw Error('The workbook contains report sheets for different dates. Export one reporting period at a time.');
+      }
+      sheetNames.push(candidate.sheet);
+      candidate.outlets.forEach(function(row){
+        if(found.has(row.key))throw Error('The outlet '+row.name+' appears on more than one report sheet. Export only one matching report.');
+        found.add(row.key);merged.push(row);
+      });
+    });
+    return {fileName:file.name,sheet:sheetNames.join(', '),from:expected.from,to:expected.to,outlets:merged};
   }
   function lookup(report,name){
     if(!report||!report.outlets)return null;
