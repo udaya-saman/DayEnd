@@ -53,7 +53,7 @@ test('outlet display uses sheet-derived data without manual settings',()=>{
  assert.match(html,/id="outletName">Awaiting outlet/);
  assert.match(html,/\.outlet-display span\{[^}]*font-size:19\.5px/);
  assert.match(html,/\.outlet-display span\{font-size:16\.5px/);
- assert.match(app,/core\.detectOutlet\(state\.daily,state\.mtd\)/);
+ assert.match(app,/core\.detectOutlet\(state\.daily,state\.mtd,state\.preferredOutlet\)/);
  assert.doesNotMatch(app,/openOutletDialog|openSettings|openGear|settingsOverlay/);
  assert.match(app,/localStorage.getItem\('dayend.outlet.v4'\)/);
 });
