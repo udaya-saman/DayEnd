@@ -1,12 +1,13 @@
-/* DAY END v4.0.0 application controller. No report content is stored or transmitted. */
-(function(){
+/* DAY END v4.1.0. Local-only reporting and accessible interface. */
+(function () {
 'use strict';
 const core=window.DayEndCore;
 const $=id=>document.getElementById(id);
-const DEFAULT_OUTLETS=['Akuressa','Embilipitiya','Monaragala','Matara','Matara 02','Matara 2','Tangalle'];
+const DEFAULT_OUTLETS=['Akuressa','Embilipitiya','Monaragala','Matara','Matara 02','Tangalle'];
 const STORE_KEY='dayend.outlet.v4';
-const state={daily:null,mtd:null,busy:false,revision:0,view:'upload',metric:'noDoc',error:[],dateOrder:'DMY'};
-function savedOutlet(){
+const state={daily:null,mtd:null,busy:false,revision:0,view:'upload',metric:'noDoc',error:[],dateOrder:'DMY',outlet:null};
+const previouslyFocused={element:null};
+function storedOutlet(){
  try{return String(localStorage.getItem(STORE_KEY)||'Matara 2');}
  catch(_){return 'Matara 2';}
 }
@@ -14,143 +15,128 @@ function persistOutlet(value){
  try{localStorage.setItem(STORE_KEY,value);return true;}
  catch(_){return false;}
 }
-state.outlet=savedOutlet();
-function presentOutlet(name){
- return core.outletKey(name)==='matara 2'?'Matara 02':name;
-}
-function allOutlets(){
+state.outlet=storedOutlet();
+function presentOutlet(value){return core.outletKey(value)==='matara 2'?'Matara 02':value;}
+function allOutlets() {
  const names=new Map();
  DEFAULT_OUTLETS.forEach(name=>{if(!names.has(core.outletKey(name)))names.set(core.outletKey(name),presentOutlet(name));});
  [state.daily,state.mtd].forEach(report=>{
-  (report?.outlets||[]).forEach(entry=>{if(!names.has(entry.key))names.set(entry.key,entry.name);});
+  (report?.outlets||[]).forEach(row=>{
+   if(!names.has(row.key))names.set(row.key,row.name);
+  });
  });
  if(!names.has(core.outletKey(state.outlet)))names.set(core.outletKey(state.outlet),state.outlet);
- return Array.from(names.values()).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+ return [...names.values()].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
 }
-function fillSelect(select,selected){
- const key=core.outletKey(selected),items=allOutlets();
- select.replaceChildren(...items.map(name=>{
-  const option=document.createElement('option');
-  option.value=name;option.textContent=name;return option;
+function sharedOutlets(){
+ if(!state.daily||!state.mtd)return null;
+ const mtdKeys=new Set(state.mtd.outlets.map(row=>row.key));
+ return new Set(state.daily.outlets.filter(row=>mtdKeys.has(row.key)).map(row=>row.key));
+}
+function fillSelect(select,chosen) {
+ const list=allOutlets(),shared=sharedOutlets(),selectedKey=core.outletKey(chosen);
+ select.replaceChildren(...list.map(name=>{
+  const option=document.createElement('option'),key=core.outletKey(name);
+  option.value=name;option.disabled=!!shared&&!shared.has(key);
+  option.textContent=option.disabled?name+' (not in both reports)':name;
+  return option;
  }));
- const exact=items.find(name=>core.outletKey(name)===key);
- select.value=exact||items[0]||'';
+ const saved=list.find(name=>core.outletKey(name)===selectedKey);
+ if(saved)select.value=saved;
 }
-function message(target,kind,title,items){
- const div=document.createElement('div');div.className='notice '+kind;
- const strong=document.createElement('strong');strong.textContent=title;div.append(strong);
+function message(host,kind,title,items){
+ const box=document.createElement('div');box.className='notice '+kind;
+ const strong=document.createElement('strong');strong.textContent=title;box.append(strong);
  if(items?.length){
-  const list=document.createElement('ul');
-  items.forEach(item=>{const li=document.createElement('li');li.textContent=item;list.append(li);});
-  div.append(list);
+  const ul=document.createElement('ul');
+  items.forEach(item=>{const li=document.createElement('li');li.textContent=item;ul.append(li);});
+  box.append(ul);
  }
- target.append(div);
+ host.append(box);
 }
 function selectionResult(){
  if(!state.daily||!state.mtd)return null;
  return core.validate(state.daily,state.mtd,state.outlet);
 }
-function setView(name){
+function setView(name) {
  state.view=name;
  $('uploadScreen').hidden=name!=='upload';
  $('resultScreen').hidden=name!=='result';
- document.documentElement.scrollTop=0;
  window.scrollTo(0,0);
  if(name==='result')renderResult();
 }
 function renderUpload(){
  $('outletName').textContent=presentOutlet(state.outlet);
- fillSelect($('outletSelect'),state.outlet);
- [['daily','dailyCard','dailyFile'],['mtd','mtdCard','mtdFile']].forEach(([kind,card,file])=>{
+ for(const [kind,cardId,fileId] of [['daily','dailyCard','dailyFile'],['mtd','mtdCard','mtdFile']]){
   const report=state[kind];
-  $(card).classList.toggle('ready',!!report);
-  $(file).textContent=report?('✓ '+report.fileName):'No file selected';
- });
- const result=selectionResult();
- const container=$('uploadMessages');container.replaceChildren();
- if(state.error.length)message(container,'error','Check your reports',state.error);
- if(result&&!result.ok)message(container,'error','Some figures need attention',result.errors);
- if(result?.ok&&result.warnings.length)message(container,'warning','Checked with a small difference',result.warnings);
- $('showReport').disabled=state.busy||!result?.ok;
- $('showReport').textContent=state.busy?'Reading reports…':'View report →';
- $('dailyInput').disabled=state.busy;$('mtdInput').disabled=state.busy;
- $('saveOutlet').disabled=state.busy;
- if(state.view==='result'){
-  if(!result?.ok)setView('upload');
-  else renderResult();
+  $(cardId).classList.toggle('ready',!!report);
+  $(fileId).textContent=report?'✓ '+report.fileName:'No file selected';
  }
-}
-function dateLabel(date){
- if(!date)return '—';
- const dt=new Date(date+'T00:00:00Z');
- return new Intl.DateTimeFormat('en-GB',{timeZone:'UTC',day:'2-digit',month:'short',year:'numeric'}).format(dt);
-}
-function formatValue(value,key){
- if(value==null||!Number.isFinite(value))return '—';
- return core.formatNumber(value);
-}
-function currentMetricLabel(){
- return core.METRICS.find(x=>x.key===state.metric)?.label||'No. Doc';
+ const result=selectionResult(),messages=$('uploadMessages');
+ messages.replaceChildren();
+ if(state.error.length)message(messages,'error','Check your reports',state.error);
+ if(result&&!result.ok)message(messages,'error','Please check these details',result.errors);
+ if(result?.ok&&result.warnings.length)message(messages,'warning','Accepted with a small difference',result.warnings);
+ $('showReport').disabled=state.busy||!result?.ok;
+ $('showReport').textContent=state.busy?'Reading reports…':'View Report →';
+ $('dailyInput').disabled=state.busy;
+ $('mtdInput').disabled=state.busy;
+ $('openSettings').disabled=state.busy;
+ if(state.view==='result'&&!result?.ok)setView('upload');
 }
 function renderResult(){
- const result=selectionResult();if(!result?.ok)return;
- $('resultOutlet').textContent=presentOutlet(state.outlet);
- $('resultDate').textContent=dateLabel(state.daily.to);
- $('resultPeriod').textContent=dateLabel(state.mtd.from)+' – '+dateLabel(state.mtd.to);
+ const result=selectionResult();
+ if(!result?.ok)return;
  $('metric').value=state.metric;
- $('metricPosition').textContent=(core.METRICS.findIndex(metric=>metric.key===state.metric)+1)+' of '+core.METRICS.length;
- const values=core.CHANNELS.map((channel,index)=>({
-   label:channel.label,value:core.metricValue(state.metric,index,result.daily,result.mtd,result.days)
- }));
- $('totalValue').textContent=formatValue(values[4].value,state.metric);
- $('metricUnit').textContent=currentMetricLabel();
+ $('metricPosition').textContent=(core.METRICS.findIndex(x=>x.key===state.metric)+1)+' of '+core.METRICS.length;
  const body=$('resultRows');body.replaceChildren();
- values.forEach((entry,index)=>{
-  const tr=document.createElement('tr');if(index===4)tr.className='total';
-  const label=document.createElement('td'),value=document.createElement('td');
-  label.textContent=entry.label;value.textContent=formatValue(entry.value,state.metric);
-  tr.append(label,value);body.append(tr);
+ core.CHANNELS.forEach((channel,index)=>{
+  const row=document.createElement('tr');
+  if(index===4)row.className='total';
+  const name=document.createElement('td'),value=document.createElement('td');
+  name.textContent=channel.label;
+  const amount=core.metricValue(state.metric,index,result.daily,result.mtd,result.days);
+  value.textContent=amount===null||!Number.isFinite(amount)?'—':core.formatNumber(amount);
+  row.append(name,value);body.append(row);
  });
  const warnings=$('resultWarnings');warnings.replaceChildren();
- if(result.warnings.length)message(warnings,'warning','Report accepted with a small difference',result.warnings);
- $('sourceFiles').textContent='Sources: Daily · '+state.daily.fileName+' | MTD · '+state.mtd.fileName;
+ if(result.warnings.length)message(warnings,'warning','Sales difference accepted',result.warnings);
 }
-function render(){
- renderUpload();
- if(state.view==='result')renderResult();
-}
+function render(){renderUpload();if(state.view==='result')renderResult();}
+function firstMetric(){state.metric=core.METRICS[0].key;}
 async function upload(kind,file){
  if(!file||state.busy)return;
  const revision=++state.revision;
  state.busy=true;state.error=[];
- // Never keep the previous report after a replacement attempt.
  state[kind]=null;setView('upload');render();
- try{
+ try {
   const parsed=await core.readWorkbook(file,state.dateOrder);
   if(revision!==state.revision)return;
-  if(kind==='daily'&&parsed.from!==parsed.to)throw Error('This is not a one-day Daily report. Choose the Daily report instead.');
-  if(kind==='mtd'&&(!parsed.from.endsWith('-01')||parsed.from.slice(0,7)!==parsed.to.slice(0,7)))throw Error('This is not a valid Month-to-Date report. Choose the MTD report instead.');
+  if(kind==='daily'&&parsed.from!==parsed.to)throw Error('This is not a one-day Daily report. Choose the Daily report.');
+  if(kind==='mtd'&&(!parsed.from.endsWith('-01')||parsed.from.slice(0,7)!==parsed.to.slice(0,7)))throw Error('This is not a valid Month-to-Date report. Choose the MTD report.');
   state[kind]=parsed;
- }catch(err){
-  if(revision===state.revision)state.error=[err?.message||'This Excel file could not be read. Try another copy.'];
- }finally{
+ } catch(error) {
+  if(revision===state.revision)state.error=[error?.message||'This Excel file could not be read. Choose another copy.'];
+ } finally {
   if(revision===state.revision){
    state.busy=false;render();
-   const result=selectionResult();
-   if(result?.ok){setView('result');}
+   if(selectionResult()?.ok){firstMetric();setView('result');}
   }
  }
 }
-function chooseOutlet(value){
+function changeOutlet(value){
  if(!value||state.busy)return;
  state.outlet=value;
- const persisted=persistOutlet(value);
- state.error=persisted?[]:['Your outlet was changed but could not be saved on this device.'];
+ state.error=persistOutlet(value)?[]:['Your outlet was changed, but this browser could not save it.'];
+ if(state.daily&&state.mtd&&!selectionResult()?.ok){
+  state.error.push('The selected outlet must appear in both reports. Choose another outlet or replace your files.');
+ }
  setView('upload');render();
 }
 function resetReports(){
  if(state.busy)return;
  state.revision++;state.daily=null;state.mtd=null;state.error=[];
+ firstMetric();
  $('dailyInput').value='';$('mtdInput').value='';
  setView('upload');render();
 }
@@ -161,42 +147,60 @@ for(const [kind,id] of [['daily','dailyInput'],['mtd','mtdInput']]){
   upload(kind,files[0]);
  });
  const box=$(kind+'Card');
- box.addEventListener('dragover',event=>{event.preventDefault();box.classList.add('drag');});
+ box.addEventListener('dragover',event=>{
+  event.preventDefault();if(!state.busy)box.classList.add('drag');
+ });
  box.addEventListener('dragleave',()=>box.classList.remove('drag'));
  box.addEventListener('drop',event=>{
   event.preventDefault();box.classList.remove('drag');
   if(state.busy)return;
   const files=[...event.dataTransfer.files];
-  if(files.length!==1){state.error=['Drop one Excel file into each report area.'];render();return;}
+  if(files.length!==1){state.error=['Drop only one Excel file into each area.'];render();return;}
   upload(kind,files[0]);
  });
 }
-core.METRICS.forEach(metric=>{
- const option=document.createElement('option');option.value=metric.key;option.textContent=metric.label;$('metric').append(option);
-});
+for(const metric of core.METRICS){
+ const option=document.createElement('option');option.value=metric.key;option.textContent=metric.label;
+ $('metric').append(option);
+}
 $('metric').addEventListener('change',event=>{state.metric=event.target.value;renderResult();});
 $('previousMetric').addEventListener('click',()=>{state.metric=core.adjacentMetric(state.metric,-1);renderResult();});
 $('nextMetric').addEventListener('click',()=>{state.metric=core.adjacentMetric(state.metric,1);renderResult();});
 $('showReport').addEventListener('click',()=>{if(selectionResult()?.ok)setView('result');});
-$('saveOutlet').addEventListener('click',()=>chooseOutlet($('outletSelect').value));
 $('clearFiles').addEventListener('click',resetReports);
 $('newReports').addEventListener('click',resetReports);
 $('backToUpload').addEventListener('click',()=>setView('upload'));
+function closeSettings(){
+ $('settingsOverlay').hidden=true;
+ const target=previouslyFocused.element;
+ previouslyFocused.element=null;
+ if(target?.isConnected)target.focus();
+ else $('openSettings').focus();
+}
 $('openSettings').addEventListener('click',()=>{
+ previouslyFocused.element=document.activeElement;
  fillSelect($('settingsOutlet'),state.outlet);
- $('settingsNote').textContent='Changing your outlet does not delete the original Excel files.';
- $('settingsOverlay').hidden=false;$('settingsOutlet').focus();
+ $('settingsNote').textContent=sharedOutlets()?'Only outlets found in both uploaded reports can be chosen.':'You can change the outlet at any time.';
+ $('settingsOverlay').hidden=false;
+ $('settingsOutlet').focus();
 });
-$('closeSettings').addEventListener('click',()=>{$('settingsOverlay').hidden=true;$('openSettings').focus();});
+$('closeSettings').addEventListener('click',closeSettings);
 $('confirmSettings').addEventListener('click',()=>{
- chooseOutlet($('settingsOutlet').value);
- $('settingsOverlay').hidden=true;$('openSettings').focus();
+ if($('settingsOutlet').selectedOptions[0]?.disabled)return;
+ changeOutlet($('settingsOutlet').value);
+ closeSettings();
 });
 $('settingsOverlay').addEventListener('click',event=>{
- if(event.target===$('settingsOverlay'))$('closeSettings').click();
+ if(event.target===$('settingsOverlay'))closeSettings();
 });
 document.addEventListener('keydown',event=>{
- if(event.key==='Escape'&&!$('settingsOverlay').hidden)$('closeSettings').click();
+ if($('settingsOverlay').hidden)return;
+ if(event.key==='Escape'){event.preventDefault();closeSettings();return;}
+ if(event.key!=='Tab')return;
+ const focusables=[...$('settingsOverlay').querySelectorAll('select,button')].filter(el=>!el.disabled);
+ const first=focusables[0],last=focusables.at(-1);
+ if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+ else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
 });
 render();
 if('serviceWorker'in navigator&&/^https?:$/.test(location.protocol)){
