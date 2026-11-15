@@ -99,3 +99,21 @@ test('division by zero displays a missing ticket average instead of Infinity',()
  const row=report.outlets[0];
  assert.equal(core.metricValue('docAvg',4,row,row,1),null);
 });
+
+test('Previous and Next visit all seven metrics in the original order',()=>{
+  let current=core.METRICS[0].key;
+  for(let i=1;i<core.METRICS.length;i++){
+    current=core.adjacentMetric(current,1);
+    assert.equal(current,core.METRICS[i].key);
+  }
+  for(let i=core.METRICS.length-2;i>=0;i--){
+    current=core.adjacentMetric(current,-1);
+    assert.equal(current,core.METRICS[i].key);
+  }
+});
+test('Previous and Next wrap correctly at the first and last metrics',()=>{
+  const first=core.METRICS[0].key,last=core.METRICS.at(-1).key;
+  assert.equal(core.adjacentMetric(first,-1),last);
+  assert.equal(core.adjacentMetric(last,1),first);
+  assert.equal(core.adjacentMetric(first,0),first);
+});
