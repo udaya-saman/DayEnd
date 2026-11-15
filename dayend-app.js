@@ -3,9 +3,12 @@
 'use strict';
 const core=window.DayEndCore;
 const $=id=>document.getElementById(id);
-const state={daily:null,mtd:null,busy:false,revision:0,view:'upload',metric:'noDoc',error:[],dateOrder:'DMY',outlet:''};
+function previouslySelectedOutlet() {
+ try{return localStorage.getItem('dayend.outlet.v4')||'';}catch(_){return '';}
+}
+const state={daily:null,mtd:null,busy:false,revision:0,view:'upload',metric:'noDoc',error:[],dateOrder:'DMY',outlet:'',preferredOutlet:previouslySelectedOutlet()};
 function resolveOutlet() {
- const detected=core.detectOutlet(state.daily,state.mtd);
+ const detected=core.detectOutlet(state.daily,state.mtd,state.preferredOutlet);
  state.outlet=detected.name;
  return detected;
 }
