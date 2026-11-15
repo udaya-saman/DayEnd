@@ -1,4 +1,4 @@
-/* DAY END v4.4.0. Local-only reporting and accessible interface. */
+/* DAY END v4.4.1. Local-only reporting and accessible interface. */
 (function () {
 'use strict';
 const core=window.DayEndCore;
@@ -48,7 +48,6 @@ function renderUpload(){
  if(state.error.length)message(messages,'error','Check your reports',state.error);
  if(found.error)message(messages,state.daily&&state.mtd?'error':'warning','Outlet detection', [found.error]);
  if(result&&!result.ok)message(messages,'error','Please check these details',result.errors);
- if(result?.ok&&result.warnings.length)message(messages,'warning','Accepted with a small difference',result.warnings);
  $('showReport').disabled=state.busy||!result?.ok;
  $('showReport').textContent=state.busy?'Reading reports…':'View Report →';
  $('dailyInput').disabled=state.busy;
@@ -71,8 +70,6 @@ function renderResult(){
   value.textContent=amount===null||!Number.isFinite(amount)?'—':core.formatNumber(amount);
   row.append(name,value);body.append(row);
  });
- const warnings=$('resultWarnings');warnings.replaceChildren();
- if(result.warnings.length)message(warnings,'warning','Sales difference accepted',result.warnings);
 }
 function render(){renderUpload();if(state.view==='result')renderResult();}
 function firstMetric(){state.metric=core.METRICS[0].key;}
