@@ -1,5 +1,5 @@
 'use strict';
-const CACHE='day-end-4.0.0';
+const CACHE='day-end-4.0.1';
 const CORE=[
   './','./index.html','./dayend-core.js','./dayend-app.js','./manifest.json',
   './vendor/jszip.min.js','./icons/icon-192.png','./icons/icon-512.png',
