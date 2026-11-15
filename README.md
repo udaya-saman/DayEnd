@@ -1,4 +1,4 @@
-# DAY END v4.0.0
+# DAY END v4.0.1
 
 A lightweight, mobile-first, offline-capable Pizza Hut outlet reporting web app for GitHub Pages.
 
@@ -18,7 +18,7 @@ A lightweight, mobile-first, offline-capable Pizza Hut outlet reporting web app 
 2. Choose your outlet using the **Outlet** selection or the settings button. The choice is saved in the browser.
 3. Upload one Excel workbook to **Daily report** and one to **MTD report**.
 4. When the files and chosen outlet validate, the results screen opens.
-5. Select a reporting category from the dropdown to see its five channel values.
+5. Select a reporting category from the dropdown, or tap **Previous** and **Next** to browse all seven metrics. The dropdown and displayed values stay synchronized. Navigation wraps from the last category to the first and vice versa.
 6. Choose **Edit reports** to change a workbook, or **New reports** to start again. Neither clears the saved outlet.
 
 ## Formulas (unchanged)
