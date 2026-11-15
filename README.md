@@ -1,4 +1,4 @@
-# DAY END v4.4.0
+# DAY END v4.4.1
 
 A lightweight, mobile-first, offline-capable Pizza Hut outlet reporting web app for GitHub Pages.
 
@@ -9,7 +9,7 @@ A lightweight, mobile-first, offline-capable Pizza Hut outlet reporting web app 
 - Report-dependent outlets found in uploaded workbooks are also offered, alongside the default outlet names.
 - A compact, modern two-screen design with only the necessary upload and results controls, and a clear developer credit.
 - One report category at a time, with five channels (Dine, T/Away, Delivery, Aggregator, DAY SALE).
-- Better error messages, visible accepted-tolerance warnings, original filenames in the summary, and no background file uploads.
+- Better error messages, silent accepted-tolerance handling, original filenames in the summary, and no background file uploads.
 - Safer worksheet parsing across worksheets, rejection of conflicting reporting dates or duplicate outlet rows, strict column identification, cross-report reconciliation, MTD same-month checks, and explicit file roles to handle the first day of a month.
 - Automated unit tests and updated service worker cache.
 
@@ -36,7 +36,7 @@ A lightweight, mobile-first, offline-capable Pizza Hut outlet reporting web app 
 
 The source is not rounded during calculation; displayed values are rounded to whole numbers as before.
 
-Validation requires exact document-count reconciliation and accepts sales total differences of **no more than Rs. 5.00** per Daily or MTD report. Differences above Rs. 5.00 block the result. Differences up to that amount are disclosed as warnings. The Daily report must cover one date. MTD must begin on the first day of the same month as its end date. Both report end dates must match.
+Validation requires exact document-count reconciliation and accepts sales total differences of **no more than Rs. 5.00** per Daily or MTD report. Differences above Rs. 5.00 block the result. Differences up to that amount are accepted silently (the underlying validation still tracks them internally). The Daily report must cover one date. MTD must begin on the first day of the same month as its end date. Both report end dates must match.
 
 ## Excel file requirements
 
@@ -110,3 +110,7 @@ The application header and site icon use the same branded design. The offline ca
 - All formulas and Rs. 5 tolerance remain unchanged. A previously explicitly saved outlet is used as a hint only when its row exists in both new reports; no outlet can be manually changed within this interface.
 
 **Unidentified outlet display:** Until an outlet can be identified confidently from the uploaded Excel report(s), the hero's outlet label is completely blank, including no empty badge or placeholder text. Results remain blocked when the outlet cannot be established.
+
+## v4.4.1
+
+- Removed the accepted sales difference notification from both the upload and results screens. Differences of Rs. 5.00 or less still pass without a banner; discrepancies over Rs. 5.00 still block the report with an error. No calculations or other UI behavior changed.
