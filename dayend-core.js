@@ -265,7 +265,7 @@
     return combineSheets(candidates,file.name);
   }
   // Only infer an outlet from the files themselves. Never guess among multiple outlets.
-  function detectOutlet(daily,mtd) {
+  function detectOutlet(daily,mtd,preferredOutlet) {
     var reports=[daily,mtd].filter(Boolean);
     if(!reports.length)return {name:'',error:''};
     var common=new Map();
@@ -277,6 +277,9 @@
       common.forEach(function(name,key){if(!keys.has(key))common.delete(key);});
     }
     if(common.size===1)return {name:common.values().next().value,error:''};
+    // An earlier user-selected outlet is safe only if its row is present in every new report.
+    if(common.size>1&&preferredOutlet&&common.has(outletKey(preferredOutlet)))
+      return {name:common.get(outletKey(preferredOutlet)),error:''};
     if(common.size===0){
       return {name:'',error:reports.length===2?
         'The Daily and MTD reports do not contain the same outlet. Check your files.':
