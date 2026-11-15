@@ -107,4 +107,4 @@ The application header and site icon use the same branded design. The offline ca
 - If only one matching outlet is identifiable across the uploaded files, it is selected automatically; contradictory or ambiguous multi-outlet reports are never silently assigned an outlet.
 - When report data contains multiple possible matching outlets, the app asks for outlet-specific exports rather than guessing and risking incorrect sales figures.
 - Both upload and results panels have refined internal padding, additional breathing room underneath, and improved vertical positioning while retaining fixed-height mobile page behavior.
-- All formulas and Rs. 5 tolerance remain unchanged. The old stored outlet setting is no longer used.
+- All formulas and Rs. 5 tolerance remain unchanged. A previously explicitly saved outlet is used as a hint only when its row exists in both new reports; no outlet can be manually changed within this interface.
