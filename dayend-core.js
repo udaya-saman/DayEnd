@@ -1,4 +1,4 @@
-/* DAY END v4.1.0. Pure calculations and Excel report reader. */
+/* DAY END v4.2.0. Pure calculations and Excel report reader. */
 (function (root, factory) {
   'use strict';
   var api = factory();
@@ -6,7 +6,7 @@
   else root.DayEndCore = api;
 })(typeof window !== 'undefined' ? window : this, function () {
   'use strict';
-  var VERSION = '4.1.0';
+  var VERSION = '4.2.0';
   var TOLERANCE_CENTS = 500;
   var CHANNELS = [
     {key:'dine', label:'Dine'}, {key:'takeaway',label:'T/Away'},
@@ -39,10 +39,25 @@
     return dayFirst;
   }
   function parseDateRange(rows, order) {
-    var text = rows.flat().map(clean).filter(Boolean).join(' ');
+    // Typical export dates are in the first rows; avoid flattening a huge worksheet.
+    function scan(slice) {
+      var pieces=[];
+      for(var i=0;i<slice.length;i++){
+        var row=slice[i]||[];
+        for(var j=0;j<row.length;j++)if(row[j]!==undefined&&row[j]!==null)pieces.push(clean(row[j]));
+      }
+      return pieces.filter(Boolean).join(' ');
+    }
+    var text=scan(rows.slice(0,150));
     var token = '([0-9]{4}-[0-9]{1,2}-[0-9]{1,2}|[0-9]{1,2}[/.\\-][0-9]{1,2}[/.\\-][0-9]{4})';
-    var from = text.match(new RegExp('From\\s*Date\\s*[:：]?\\s*'+token,'i'));
-    var to = text.match(new RegExp('To\\s*Date\\s*[:：]?\\s*'+token,'i'));
+    var patternFrom=new RegExp('From\\s*Date\\s*[:：]?\\s*'+token,'i');
+    var patternTo=new RegExp('To\\s*Date\\s*[:：]?\\s*'+token,'i');
+    var from=text.match(patternFrom),to=text.match(patternTo);
+    if((!from||!to)&&rows.length>150){
+      text=scan(rows.slice(150));
+      if(!from)from=text.match(patternFrom);
+      if(!to)to=text.match(patternTo);
+    }
     return {from: from?parseDateToken(from[1],order):'', to:to?parseDateToken(to[1],order):''};
   }
   function dayCount(a,b) {
@@ -183,21 +198,46 @@
   async function readWorkbook(file,order) {
     if(!file||!/\.(xlsx|xlsm)$/i.test(file.name||''))throw Error('Choose an Excel report ending in .xlsx or .xlsm.');
     if(!file.size||file.size>25*1024*1024)throw Error('The report is empty or larger than 25 MB.');
-    if(typeof JSZip==='undefined')throw Error('The Excel reader is unavailable. Reopen the app after connecting to the internet once.');
-    var zip;
-    try {zip=await JSZip.loadAsync(await file.arrayBuffer());}
-    catch(_) {throw Error('This Excel file could not be opened. Save a new .xlsx copy and try again.');}
-    var files=Object.values(zip.files).filter(function(item){return !item.dir;});
-    if(files.length>4000)throw Error('This Excel file contains too many items.');
-    var total=0;
-    files.forEach(function(item){
-      var size=item._data && item._data.uncompressedSize;
-      if(Number.isFinite(size)){total+=size;if(size>25*1024*1024||total>60*1024*1024)throw Error('This Excel file is too large to process safely.');}
-    });
-    async function read(path,max) {
-      var entry=zip.file(path);if(!entry)return null;
-      var value=await entry.async('string');
-      if(value.length>max)throw Error('The Excel report contains too much data.');
+    // Decompression in a worker prevents the main UI from freezing on large ZIP files.
+    // An inline reader remains available in browsers that block workers.
+    var sources=null,zip=null,buffer=await file.arrayBuffer();
+    if(typeof Worker!=='undefined'){
+      try {
+        sources=await new Promise(function(resolve,reject){
+          var worker=new Worker('./excel-unpack-worker.js?v=4.2.0');
+          var timer=setTimeout(function(){worker.terminate();reject(Error('The file took too long to read. Please try a smaller Excel export.'));},30000);
+          worker.onmessage=function(event){
+            clearTimeout(timer);worker.terminate();
+            if(event.data&&event.data.ok)resolve(event.data.sources);
+            else reject(Error(event.data&&event.data.error||'The Excel file could not be opened.'));
+          };
+          worker.onerror=function(event){clearTimeout(timer);worker.terminate();reject(Error('Worker unavailable'));};
+          worker.postMessage({buffer:buffer},[buffer]);
+        });
+      }catch(error) {
+        if(error.message!=='Worker unavailable')throw error;
+        buffer=await file.arrayBuffer();
+      }
+    }
+    if(!sources) {
+      if(typeof JSZip==='undefined')throw Error('The Excel reader is unavailable. Reopen the app online once.');
+      try{zip=await JSZip.loadAsync(buffer);}catch(_){throw Error('This Excel file could not be opened. Save it as .xlsx and try again.');}
+      var files=Object.values(zip.files).filter(function(item){return !item.dir;});
+      if(files.length>4000)throw Error('This Excel file contains too many items.');
+      var total=0;
+      files.forEach(function(item){
+        var size=item._data&&item._data.uncompressedSize;
+        if(Number.isFinite(size)){total+=size;if(size>25*1024*1024||total>60*1024*1024)throw Error('This Excel file is too large to process safely.');}
+      });
+    }
+    async function read(path,max){
+      var value=null;
+      if(sources)value=sources[path]||null;
+      else {
+        var entry=zip.file(path);
+        if(entry)value=await entry.async('string');
+      }
+      if(value&&value.length>max)throw Error('The Excel report contains too much data.');
       return value;
     }
     var wb=await read('xl/workbook.xml',1000000),rels=await read('xl/_rels/workbook.xml.rels',1000000);
