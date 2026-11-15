@@ -144,3 +144,10 @@ test('rejects duplicate outlets across worksheets',()=>{
   {sheet:'Second',from:sheet.from,to:sheet.to,outlets:sheet.outlets}
  ],'duplicate.xlsx'),/more than one report sheet/);
 });
+
+test('date parsing avoids traversing every row when report dates are at the top',()=>{
+ const rows=[['From Date','01/11/2026','To Date','15/11/2026']];
+ for(let i=0;i<20000;i++)rows.push([]);
+ rows[19999]=new Proxy([], {get(){throw Error('Scanned unnecessary distant cells');}});
+ assert.deepEqual(core.parseDateRange(rows,'DMY'),{from:'2026-11-01',to:'2026-11-15'});
+});
