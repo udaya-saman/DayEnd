@@ -175,3 +175,15 @@ test('reject mismatched or ambiguous multi-outlet reports without guessing',()=>
  assert.equal(ambiguous.name,'');
  assert.match(ambiguous.error,/more than one matching outlet/);
 });
+
+test('a previously selected outlet is used only when the new report contains it',()=>{
+ const daily=makeReport('2026-11-02','2026-11-02',{name:'Matara 2'});
+ daily.outlets.push({...daily.outlets[0],name:'Galle',key:'galle'});
+ const mtd=makeReport('2026-11-01','2026-11-02',{name:'Matara 02'});
+ mtd.outlets.push({...mtd.outlets[0],name:'Galle',key:'galle'});
+ const matched=core.detectOutlet(daily,mtd,'Matara 02');
+ assert.equal(core.outletKey(matched.name),'matara 2');
+ const unknown=core.detectOutlet(daily,mtd,'Akuressa');
+ assert.equal(unknown.name,'');
+ assert.match(unknown.error,/more than one matching outlet/);
+});
