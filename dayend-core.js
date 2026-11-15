@@ -1,4 +1,4 @@
-/* DAY END v4.3.0. Pure calculations and Excel report reader. */
+/* DAY END v4.4.0. Pure calculations and Excel report reader. */
 (function (root, factory) {
   'use strict';
   var api = factory();
@@ -6,7 +6,7 @@
   else root.DayEndCore = api;
 })(typeof window !== 'undefined' ? window : this, function () {
   'use strict';
-  var VERSION = '4.3.0';
+  var VERSION = '4.4.0';
   var TOLERANCE_CENTS = 500;
   var CHANNELS = [
     {key:'dine', label:'Dine'}, {key:'takeaway',label:'T/Away'},
@@ -204,7 +204,7 @@
     if(typeof Worker!=='undefined'){
       try {
         sources=await new Promise(function(resolve,reject){
-          var worker=new Worker('./excel-unpack-worker.js?v=4.3.0');
+          var worker=new Worker('./excel-unpack-worker.js?v=4.4.0');
           var timer=setTimeout(function(){worker.terminate();reject(Error('The file took too long to read. Please try a smaller Excel export.'));},30000);
           worker.onmessage=function(event){
             clearTimeout(timer);worker.terminate();
@@ -264,6 +264,28 @@
     if(!candidates.length)throw lastError||Error('No worksheet contains the expected sales report.');
     return combineSheets(candidates,file.name);
   }
+  // Only infer an outlet from the files themselves. Never guess among multiple outlets.
+  function detectOutlet(daily,mtd) {
+    var reports=[daily,mtd].filter(Boolean);
+    if(!reports.length)return {name:'',error:''};
+    var common=new Map();
+    (reports[0].outlets||[]).forEach(function(row){
+      if(row.key&&!common.has(row.key))common.set(row.key,row.name);
+    });
+    for(var i=1;i<reports.length;i++){
+      var keys=new Set((reports[i].outlets||[]).map(function(row){return row.key;}));
+      common.forEach(function(name,key){if(!keys.has(key))common.delete(key);});
+    }
+    if(common.size===1)return {name:common.values().next().value,error:''};
+    if(common.size===0){
+      return {name:'',error:reports.length===2?
+        'The Daily and MTD reports do not contain the same outlet. Check your files.':
+        'No outlet was found in this report.'};
+    }
+    return {name:'',error:reports.length===2?
+      'These reports contain more than one matching outlet. Upload outlet-specific reports so the correct outlet can be identified.':
+      'This report contains multiple outlets. Add the other report to identify the outlet.'};
+  }
   function lookup(report,name){
     if(!report||!report.outlets)return null;
     var matches=report.outlets.filter(function(r){return r.key===outletKey(name);});
@@ -322,5 +344,5 @@
   return {VERSION:VERSION,CHANNELS:CHANNELS,adjacentMetric:adjacentMetric,METRICS:METRICS,TOLERANCE_CENTS:TOLERANCE_CENTS,
     clean:clean,outletKey:outletKey,iso:iso,parseDateToken:parseDateToken,parseDateRange:parseDateRange,dayCount:dayCount,
     cents:cents,formatNumber:formatNumber,formatMoney:formatMoney,toNumber:toNumber,
-    findTable:findTable,parseSheetRows:parseSheetRows,combineSheets:combineSheets,readWorkbook:readWorkbook,lookup:lookup,validate:validate,metricValue:metricValue};
+    findTable:findTable,parseSheetRows:parseSheetRows,combineSheets:combineSheets,readWorkbook:readWorkbook,lookup:lookup,detectOutlet:detectOutlet,validate:validate,metricValue:metricValue};
 });
