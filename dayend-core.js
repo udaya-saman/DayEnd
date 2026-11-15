@@ -254,7 +254,13 @@
       default:return null;
     }
   }
-  return {VERSION:VERSION,CHANNELS:CHANNELS,METRICS:METRICS,TOLERANCE_CENTS:TOLERANCE_CENTS,
+  function adjacentMetric(current,step) {
+    var index=METRICS.findIndex(function(metric){return metric.key===current;});
+    if(index<0)index=0;
+    if(step!==-1&&step!==1)return METRICS[index].key;
+    return METRICS[(index+step+METRICS.length)%METRICS.length].key;
+  }
+  return {VERSION:VERSION,CHANNELS:CHANNELS,adjacentMetric:adjacentMetric,METRICS:METRICS,TOLERANCE_CENTS:TOLERANCE_CENTS,
     clean:clean,outletKey:outletKey,iso:iso,parseDateToken:parseDateToken,parseDateRange:parseDateRange,dayCount:dayCount,
     cents:cents,formatNumber:formatNumber,formatMoney:formatMoney,toNumber:toNumber,
     findTable:findTable,parseSheetRows:parseSheetRows,readWorkbook:readWorkbook,lookup:lookup,validate:validate,metricValue:metricValue};
